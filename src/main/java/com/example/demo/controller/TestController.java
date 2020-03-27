@@ -32,13 +32,13 @@ public class TestController {
     }
 
     @ApiOperation(value = "根据姓名查询用户信息")
-    @PostMapping(value = "findName")
+    @PostMapping(value = "/findName")
     List<User> findName(@RequestParam(value = "name") String name) {
         return repository.findByNameLike(name);
     }
 
     @ApiOperation(value = "查询所有")
-    @PostMapping(value = "findAll")
+    @PostMapping(value = "/findAll")
         //currentPage 当前页，默认为0，如果传1的话是查的第二页数据
         //pageSize 每页数据条数
     Page<User> findAll(@RequestParam(value = "currentPage") int currentPage, @RequestParam(value = "pageSize") int pageSize) {
