@@ -16,6 +16,12 @@ public interface UserService {
     AdminUserDetails getAdminByUsername(String username);
 
     /**
+     * 根据用户id_card登录
+     */
+
+    AdminUserDetails getAdminByIdCard(String idCard);
+
+    /**
      * 注册功能
      */
     User register(User user);
@@ -48,15 +54,5 @@ public interface UserService {
      * 修改指定用户信息
      */
     int update(Long id, User user);
-
-    /**
-     * 删除指定用户
-     */
-    int delete(Long id);
-
-    /**
-     * 新用户注册
-     */
-    void save(User user);
 
 }

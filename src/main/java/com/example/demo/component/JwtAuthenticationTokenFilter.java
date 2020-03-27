@@ -1,6 +1,5 @@
 package com.example.demo.component;
 
-import com.example.demo.util.JwtTokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

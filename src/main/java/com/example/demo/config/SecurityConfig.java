@@ -65,15 +65,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 )
                 .permitAll()
                 // 对登录注册要允许匿名访问
-                .antMatchers("/authenticate", "/register").permitAll()
+                .antMatchers("/user/login", "/user/register").permitAll()
                 //跨域请求会先进行一次options请求
                 .antMatchers(HttpMethod.OPTIONS)
                 .permitAll()
                 //测试时全部运行访问
                 .antMatchers("/**")
                 .permitAll();
-                //商品查询接口开放
-                // 除上面外的所有请求全部需要鉴权认证
+        //商品查询接口开放
+        // 除上面外的所有请求全部需要鉴权认证
 //                .anyRequest()
 //                .authenticated()
         ;
@@ -104,6 +104,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //获取登录用户信息
         return username -> {
             AdminUserDetails adminUserDetails = userService.getAdminByUsername(username);
+            if (adminUserDetails == null) {
+                adminUserDetails = userService.getAdminByIdCard(username);
+                if (adminUserDetails != null) {
+                    return adminUserDetails;
+                }
+            }
             if (adminUserDetails != null) {
                 return adminUserDetails;
             }

@@ -1,11 +1,11 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.bo.AdminUserDetails;
+import com.example.demo.component.JwtTokenUtil;
 import com.example.demo.model.RoleType;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
-import com.example.demo.util.JwtTokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -38,8 +39,8 @@ public class UserServiceImpl implements UserService {
     private UserDetailsService userDetailsService;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
+    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Value("${jwt.tokenHead}")
     private String tokenHead;
     @Autowired
@@ -56,13 +57,23 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    @Override
+    public AdminUserDetails getAdminByIdCard(String idCard) {
+        List<User> adminList = adminMapper.findByIdCardLike(idCard);
+        if (adminList != null && adminList.size() > 0) {
+            AdminUserDetails adminDetails = new AdminUserDetails(adminList.get(0));
+            return adminDetails;
+        }
+        return null;
+    }
+
     public User register(User user) {
         user.setCreateTime(new Timestamp(new Date().getTime()));
         user.setIsAdmin(RoleType.ADMIN);
         //查询是否有相同用户名的用户
         //将密码进行加密操作
-        String md5Password = passwordEncoder.encode(user.getPassword());
-        user.setPassword(md5Password);
+        String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+        user.setPassword(hashed);
         adminMapper.save(user);
         return user;
     }
@@ -71,7 +82,7 @@ public class UserServiceImpl implements UserService {
     public String login(String username, String password) {
         String token = null;
         //密码需要客户端加密后传递
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, passwordEncoder.encode(password));
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
         try {
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -104,14 +115,4 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    @Override
-    public int delete(Long id) {
-        adminMapper.deleteById(id);
-        return 0;
-    }
-
-    @Override
-    public void save(User user) {
-        adminMapper.save(user);
-    }
 }

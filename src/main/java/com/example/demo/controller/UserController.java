@@ -4,25 +4,52 @@ package com.example.demo.controller;
 import com.example.demo.common.BaseController;
 import com.example.demo.common.BaseResult;
 import com.example.demo.common.Constants;
+import com.example.demo.component.JwtTokenUtil;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
-@Api(value = "用户模块")
-@RestController("/user")
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
+
+@Api(value = "用户")
+@RestController
+@RequestMapping("/user")
 public class UserController extends BaseController {
 
     @Autowired
     private UserService userService;
+    @Value("${jwt.tokenHeader}")
+    private String tokenHeader;
+    @Value("${jwt.tokenHead}")
+    private String tokenHead;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+
+    @ApiOperation(value = "用户注册")
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    @ResponseBody
+    public Object register(@RequestBody User user) {
+        userService.register(user);
+        return ResponseEntity.ok(new BaseResult(Constants.RESPONSE_CODE_200, "注册成功"));
+    }
+
+
     //打印log日志
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -34,17 +61,46 @@ public class UserController extends BaseController {
         String token = "";
         try {
             //学员登录
-            if (StringUtils.isEmpty(user.getIdCard()) && StringUtils.isEmpty(user.getPassword())) {
+            if (!StringUtils.isEmpty(user.getIdCard()) && !StringUtils.isEmpty(user.getPassword())) {
                 token = userService.login(user.getIdCard(), user.getPassword());
-            } else if (StringUtils.isEmpty(user.getUserName()) && StringUtils.isEmpty(user.getPassword())) {
+            } else if (!StringUtils.isEmpty(user.getUserName()) && !StringUtils.isEmpty(user.getPassword())) {
                 token = userService.login(user.getUserName(), user.getPassword());
             }
         } catch (Exception e) {
             e.printStackTrace();
-            new BaseResult(Constants.RESPONSE_CODE_403, "用户名密码错误");
+            return new BaseResult(Constants.RESPONSE_CODE_403, "用户名密码错误");
         }
-        return new BaseResult(Constants.RESPONSE_CODE_200, "登录成功", token);
+        Map<String, String> tokenMap = new HashMap<>();
+        tokenMap.put("token", token);
+        tokenMap.put("tokenHead", tokenHead);
+        return new BaseResult(Constants.RESPONSE_CODE_200, "登录成功", tokenMap);
     }
+
+
+    @ApiOperation(value = "刷新token")
+    @RequestMapping(value = "/token/refresh", method = RequestMethod.GET)
+    @ResponseBody
+    public Object refreshToken(HttpServletRequest request) {
+        String token = request.getHeader(tokenHeader);
+        String refreshToken = userService.refreshToken(token);
+        if (refreshToken == null) {
+            return new BaseResult(Constants.RESPONSE_CODE_500, "刷新token失败");
+        }
+        Map<String, String> tokenMap = new HashMap<>();
+        tokenMap.put("token", token);
+        tokenMap.put("tokenHead", tokenHead);
+        return new BaseResult(Constants.RESPONSE_CODE_200, "sucess", tokenMap);
+    }
+
+
+    @ApiOperation(value = "修改密码")
+    @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
+    @ResponseBody
+    public Object changePassword(@RequestBody User user) {
+        userService.register(user);
+        return ResponseEntity.ok(new BaseResult(Constants.RESPONSE_CODE_200, "注册成功"));
+    }
+
 
 
 }
