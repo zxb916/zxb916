@@ -1,20 +1,26 @@
-package com.example.demo.controller;
+package com.example.demo.config;
 
 
+import com.example.demo.bo.AdminUserDetails;
 import com.example.demo.component.JwtAuthenticationTokenFilter;
 import com.example.demo.component.RestAuthenticationEntryPoint;
 import com.example.demo.component.RestfulAccessDeniedHandler;
+import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -31,8 +37,8 @@ import org.springframework.web.filter.CorsFilter;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    //    @Autowired
-//    private UmsAdminService adminService;
+    @Autowired
+    private UserService userService;
     @Autowired
     private RestfulAccessDeniedHandler restfulAccessDeniedHandler;
     @Autowired
@@ -58,19 +64,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/v2/api-docs/**"
                 )
                 .permitAll()
-                // 对登录注册要允许匿名访问 productCategory/list
-                .antMatchers("/user/login", "/user/register")
-                .permitAll()
+                // 对登录注册要允许匿名访问
+                .antMatchers("/authenticate", "/register").permitAll()
                 //跨域请求会先进行一次options请求
                 .antMatchers(HttpMethod.OPTIONS)
                 .permitAll()
                 //测试时全部运行访问
                 .antMatchers("/**")
                 .permitAll();
-        //商品查询接口开放
-        // 除上面外的所有请求全部需要鉴权认证
+                //商品查询接口开放
+                // 除上面外的所有请求全部需要鉴权认证
 //                .anyRequest()
-//                .authenticated();
+//                .authenticated()
+        ;
         // 禁用缓存
         httpSecurity.headers().cacheControl();
         // 添加JWT filter
@@ -92,19 +98,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-//    @Override
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//        //获取登录用户信息
-//        return username -> {
-//            UmsAdmin admin = adminService.getAdminByUsername(username);
-//            if (admin != null) {
-//                List<UmsPermission> permissionList = adminService.getPermissionList(admin.getId());
-//                return new AdminUserDetails(admin, permissionList);
-//            }
-//            throw new UsernameNotFoundException("用户名或密码错误");
-//        };
-//    }
+    @Override
+    @Bean
+    public UserDetailsService userDetailsService() {
+        //获取登录用户信息
+        return username -> {
+            AdminUserDetails adminUserDetails = userService.getAdminByUsername(username);
+            if (adminUserDetails != null) {
+                return adminUserDetails;
+            }
+            throw new UsernameNotFoundException("用户名或密码错误");
+        };
+    }
+
+    @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
     @Bean
     public JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter() {
@@ -112,6 +123,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /**
+     * X
      * 允许跨域调用的过滤器
      */
     @Bean
@@ -127,17 +139,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         bean.setOrder(0);
         return new CorsFilter(source);
     }
-
-
-//    @Bean
-//    public FilterInvocationSecurityMetadataSource mySecurityMetadataSource() {
-//        MyFilterInvocationSecurityMetadataSource securityMetadataSource = new MyFilterInvocationSecurityMetadataSource();
-//        return securityMetadataSource;
-//    }
-//    @Bean
-//    public AccessDecisionManager myAccessDecisionManager() {
-//        return new MyAccessDecisionManager();
-//    }
 
 
 }

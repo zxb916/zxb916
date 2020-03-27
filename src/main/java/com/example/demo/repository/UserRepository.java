@@ -1,6 +1,6 @@
 package com.example.demo.repository;
 
-import com.example.demo.model.Test;
+import com.example.demo.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public interface UserRepository extends CrudRepository<Test, Long> {
+public interface UserRepository extends CrudRepository<User, Long> {
 
-    Optional<Test> findById(Long id);
+    Optional<User> findById(Long id);
 
-    @Query(value = "select * from t_user where name like %?1%", nativeQuery = true)
-    List<Test> findByNameLike(String name);
+    @Query(value = "select * from user where user_name like %?1%", nativeQuery = true)
+    List<User> findByNameLike(String name);
 
-    Page<Test> findAll(@PageableDefault(value = 15, sort = {"datetime"}, direction = Sort.Direction.DESC) Pageable pageable);
+    Page<User> findAll(@PageableDefault(value = 15, sort = {"datetime"}, direction = Sort.Direction.DESC) Pageable pageable);
 }
