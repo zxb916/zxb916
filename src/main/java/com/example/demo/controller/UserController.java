@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
 
+import com.alibaba.fastjson.JSONObject;
+import com.example.demo.bo.AdminUserDetails;
 import com.example.demo.common.BaseController;
 import com.example.demo.common.BaseResult;
 import com.example.demo.common.Constants;
@@ -16,6 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -96,11 +100,27 @@ public class UserController extends BaseController {
     @ApiOperation(value = "修改密码")
     @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
     @ResponseBody
-    public Object changePassword(@RequestBody User user) {
-        userService.register(user);
+    public Object changePassword(@RequestBody String str) {
+        logger.info("修改密码", str);
+
+        try {
+            Map<String, String> object = (Map<String, String>) JSONObject.parse(str);
+            String idCard = object.get("idCard");
+            String oldPassword = object.get("oldPassword");
+            String newPassword = object.get("newPassword");
+            AdminUserDetails adminUserDetails = userService.getAdminByIdCard(idCard);
+            if (adminUserDetails == null) {
+                return new UsernameNotFoundException("用户不存在");
+            }
+            User user = adminUserDetails.getUser();
+            if (!BCrypt.checkpw(oldPassword, user.getPassword()))
+                return new UsernameNotFoundException("原始密码错误");
+            user.setPassword(newPassword);
+        } catch (Exception e) {
+
+        }
         return ResponseEntity.ok(new BaseResult(Constants.RESPONSE_CODE_200, "注册成功"));
     }
-
 
 
 }

@@ -14,12 +14,17 @@ import java.util.List;
  * Created by macro on 2018/4/26.
  */
 public class AdminUserDetails implements UserDetails {
+
+
     private User user;
 
     public AdminUserDetails(User user) {
         this.user = user;
     }
 
+    public User getUser() {
+        return user;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

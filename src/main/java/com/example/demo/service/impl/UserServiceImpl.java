@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
         user.setIsAdmin(RoleType.ADMIN);
         //查询是否有相同用户名的用户
         //将密码进行加密操作
-        String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+        String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(12));
         user.setPassword(hashed);
         adminMapper.save(user);
         return user;
