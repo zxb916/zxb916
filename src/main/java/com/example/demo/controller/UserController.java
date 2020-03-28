@@ -32,6 +32,10 @@ import java.util.Map;
 @RequestMapping("/user")
 public class UserController extends BaseController {
 
+
+    //打印log日志
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
     @Autowired
     private UserService userService;
     @Value("${jwt.tokenHeader}")
@@ -54,10 +58,6 @@ public class UserController extends BaseController {
     }
 
 
-    //打印log日志
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
-
     @ApiOperation(value = "登录")
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResult login(@RequestBody User user) {
@@ -70,9 +70,11 @@ public class UserController extends BaseController {
             } else if (!StringUtils.isEmpty(user.getUserName()) && !StringUtils.isEmpty(user.getPassword())) {
                 token = userService.login(user.getUserName(), user.getPassword());
             }
+            if (token == null) {
+                return new BaseResult(Constants.RESPONSE_CODE_403, "用户名密码错误");
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return new BaseResult(Constants.RESPONSE_CODE_403, "用户名密码错误");
         }
         Map<String, String> tokenMap = new HashMap<>();
         tokenMap.put("token", token);
@@ -82,9 +84,8 @@ public class UserController extends BaseController {
 
 
     @ApiOperation(value = "刷新token")
-    @RequestMapping(value = "/token/refresh", method = RequestMethod.GET)
-    @ResponseBody
-    public Object refreshToken(HttpServletRequest request) {
+    @GetMapping(value = "/token/refresh")
+    public BaseResult refreshToken(HttpServletRequest request) {
         String token = request.getHeader(tokenHeader);
         String refreshToken = userService.refreshToken(token);
         if (refreshToken == null) {
@@ -98,7 +99,7 @@ public class UserController extends BaseController {
 
 
     @ApiOperation(value = "修改密码")
-    @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
+    @PostMapping(value = "/changePassword", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Object changePassword(@RequestBody String str) {
         logger.info("修改密码", str);
@@ -115,12 +116,49 @@ public class UserController extends BaseController {
             User user = adminUserDetails.getUser();
             if (!BCrypt.checkpw(oldPassword, user.getPassword()))
                 return new UsernameNotFoundException("原始密码错误");
-            user.setPassword(newPassword);
+            String hashed = BCrypt.hashpw(newPassword, BCrypt.gensalt(12));
+            user.setPassword(hashed);
+            userService.update(user);
         } catch (Exception e) {
-
+            return ResponseEntity.ok(new BaseResult(Constants.RESPONSE_CODE_500, "数据库异常"));
         }
-        return ResponseEntity.ok(new BaseResult(Constants.RESPONSE_CODE_200, "注册成功"));
+        return ResponseEntity.ok(new BaseResult(Constants.RESPONSE_CODE_200, "修改密码成功"));
     }
 
+    @ApiOperation(value = "重置密码")
+    @GetMapping(value = "/resetPassword")
+    public BaseResult refreshToken(@RequestParam("idCard") String idCard) {
+        logger.info("重置密码" + idCard);
+        if (idCard == null) {
+            return new BaseResult(Constants.RESPONSE_CODE_500, "idCard不能为null");
+        }
+        AdminUserDetails adminUserDetails = userService.getAdminByIdCard(idCard);
+        if (adminUserDetails == null) {
+            return new BaseResult(Constants.RESPONSE_CODE_404, "该用户不存在");
+        }
+        User user = adminUserDetails.getUser();
+        String hashed = BCrypt.hashpw("123456", BCrypt.gensalt(12));
+        user.setPassword(hashed);
+        userService.update(user);
+        return new BaseResult(Constants.RESPONSE_CODE_200, "重置密码成功");
+    }
+
+
+    @ApiOperation(value = "查询学员基本信息")
+    @GetMapping(value = "/getOne")
+    public BaseResult getOne(@RequestParam("idCard") String idCard) {
+        logger.info("查询学员基本信息" + idCard);
+        User user = null;
+        try {
+            AdminUserDetails adminUserDetails = userService.getAdminByIdCard(idCard);
+            if (adminUserDetails == null) {
+                return new BaseResult(Constants.RESPONSE_CODE_404, "用户不存在");
+            }
+            user = adminUserDetails.getUser();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new BaseResult(Constants.RESPONSE_CODE_200, "ok", user);
+    }
 
 }

@@ -1,5 +1,8 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.springframework.data.annotation.CreatedDate;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -10,59 +13,73 @@ public class User {
     /**
      * id
      */
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     /**
      * 角色 是否是管理员
      */
+    @Column(name = "is_admin")
     private RoleType isAdmin;
     /**
      * 用户名
      */
+    @Column(name = "user_name")
     private String userName;
     /**
      * 身份证
      */
+    @Column(name = "id_card")
     private String idCard;
     /**
      * 士兵证
      */
+    @Column(name = "soldier_id")
     private String soldierId;
     /**
      * 军衔
      */
+    @Column(name = "armed_rank")
     private ArmedRankType armedRank;
     /**
      * 联系电话
      */
+    @Column(name = "mobile")
     private String mobile;
     /**
      * 部号
      */
+    @Column(name = "dept_no")
     private String deptno;
     /**
      * 通信地址
      */
+    @Column(name = "mailing_address")
     private String mailingAddress;
     /**
      * 密码
      */
+    @Column(name = "password")
     private String password;
     /**
      * 入伍月份
      */
+    @Column(name = "join_time")
     private Date joinTime;
     /**
      * 创建时间
      */
+    @Column(name = "create_time")
+    @CreatedDate
     private Timestamp createTime;
     /**
      * 用户元信息
      */
+    @JsonManagedReference
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = UserExt.class)
     private UserExt userExt;
 
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     public Long getId() {
         return id;
     }
@@ -71,7 +88,7 @@ public class User {
         this.id = id;
     }
 
-    @Column(name = "is_admin")
+
     public RoleType getIsAdmin() {
         return isAdmin;
     }
@@ -80,7 +97,7 @@ public class User {
         this.isAdmin = isAdmin;
     }
 
-    @Column(name = "user_name")
+
     public String getUserName() {
         return userName;
     }
@@ -89,7 +106,7 @@ public class User {
         this.userName = userName;
     }
 
-    @Column(name = "id_card")
+
     public String getIdCard() {
         return idCard;
     }
@@ -98,7 +115,7 @@ public class User {
         this.idCard = idCard;
     }
 
-    @Column(name = "soldier_id")
+
     public String getSoldierId() {
         return soldierId;
     }
@@ -107,7 +124,7 @@ public class User {
         this.soldierId = soldierId;
     }
 
-    @Column(name = "armed_rank")
+
     public ArmedRankType getArmedRank() {
         return armedRank;
     }
@@ -116,7 +133,7 @@ public class User {
         this.armedRank = armedRank;
     }
 
-    @Column(name = "mobile")
+
     public String getMobile() {
         return mobile;
     }
@@ -125,7 +142,7 @@ public class User {
         this.mobile = mobile;
     }
 
-    @Column(name = "dept_no")
+
     public String getDeptno() {
         return deptno;
     }
@@ -134,7 +151,7 @@ public class User {
         this.deptno = deptno;
     }
 
-    @Column(name = "mailing_address")
+
     public String getMailingAddress() {
         return mailingAddress;
     }
@@ -143,7 +160,7 @@ public class User {
         this.mailingAddress = mailingAddress;
     }
 
-    @Column(name = "password")
+
     public String getPassword() {
         return password;
     }
@@ -152,7 +169,7 @@ public class User {
         this.password = password;
     }
 
-    @Column(name = "join_time")
+
     public Date getJoinTime() {
         return joinTime;
     }
@@ -161,7 +178,7 @@ public class User {
         this.joinTime = joinTime;
     }
 
-    @Column(name = "create_time")
+
     public Timestamp getCreateTime() {
         return createTime;
     }
@@ -170,8 +187,6 @@ public class User {
         this.createTime = createTime;
     }
 
-    @OneToOne
-    @JoinColumn(name = "userMeta_id", referencedColumnName = "id")
     public UserExt getUserMeta() {
         return userExt;
     }

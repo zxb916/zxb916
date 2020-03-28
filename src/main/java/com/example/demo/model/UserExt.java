@@ -1,49 +1,60 @@
 package com.example.demo.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(name = "user_ext")
 public class UserExt {
     /**
-     *外键id
+     * 外键id
      */
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     /**
-     *性别
+     * 性别
      */
+    @Column(name = "sex")
     private String sex;
     /**
-     *生日
+     * 生日
      */
+    @Column(name = "birthdy")
     private Date birthdy;
     /**
-     *文化程度
+     * 文化程度
      */
+    @Column(name = "degree")
     private String degree;
     /**
-     *邮编
+     * 邮编
      */
+    @Column(name = "post_code")
     private String postCode;
     /**
-     *头像
+     * 头像
      */
+    @Column(name = "profile_photo")
     private String profilePhoto;
 
-    @Id
-    public Long getId() {
-        return id;
+
+    @JsonBackReference
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = User.class)
+    private User user;
+
+
+    public User getUser() {
+        return user;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    @Column(name = "sex")
     public String getSex() {
         return sex;
     }
@@ -52,7 +63,7 @@ public class UserExt {
         this.sex = sex;
     }
 
-    @Column(name = "birthdy")
+
     public Date getBirthdy() {
         return birthdy;
     }
@@ -61,7 +72,7 @@ public class UserExt {
         this.birthdy = birthdy;
     }
 
-    @Column(name = "degree")
+
     public String getDegree() {
         return degree;
     }
@@ -70,7 +81,7 @@ public class UserExt {
         this.degree = degree;
     }
 
-    @Column(name = "post_code")
+
     public String getPostCode() {
         return postCode;
     }
@@ -79,12 +90,20 @@ public class UserExt {
         this.postCode = postCode;
     }
 
-    @Column(name = "profile_photo")
+
     public String getProfilePhoto() {
         return profilePhoto;
     }
 
     public void setProfilePhoto(String profilePhoto) {
         this.profilePhoto = profilePhoto;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

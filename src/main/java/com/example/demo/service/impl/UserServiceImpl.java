@@ -110,8 +110,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int update(Long id, User user) {
-        return 0;
+    public void update(User user) {
+        adminMapper.save(user);
     }
 
 

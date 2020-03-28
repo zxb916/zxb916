@@ -53,6 +53,7 @@ public interface UserService {
     /**
      * 修改指定用户信息
      */
-    int update(Long id, User user);
+    void update(User user);
+
 
 }
