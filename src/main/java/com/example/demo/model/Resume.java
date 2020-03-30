@@ -6,26 +6,35 @@ import java.util.Date;
 @Entity
 @Table(name = "resume")
 public class Resume {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     /**
      * 开始时间
      */
+    @Column(name = "start_time")
     private Date startTime;
     /**
      * 结束时间
      */
+    @Column(name = "end_time")
     private Date endTime;
     /**
      * 所在单位
      */
+    @Column(name = "unit")
     private String unit;
     /**
      * 专业名称
      */
+    @Column(name = "major_name")
     private String majorName;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+
     public Long getId() {
         return id;
     }
@@ -34,7 +43,7 @@ public class Resume {
         this.id = id;
     }
 
-    @Column(name = "start_time")
+
     public Date getStartTime() {
         return startTime;
     }
@@ -43,7 +52,7 @@ public class Resume {
         this.startTime = startTime;
     }
 
-    @Column(name = "end_time")
+
     public Date getEndTime() {
         return endTime;
     }
@@ -52,7 +61,7 @@ public class Resume {
         this.endTime = endTime;
     }
 
-    @Column(name = "unit")
+
     public String getUnit() {
         return unit;
     }
@@ -61,7 +70,7 @@ public class Resume {
         this.unit = unit;
     }
 
-    @Column(name = "major_name")
+
     public String getMajorName() {
         return majorName;
     }

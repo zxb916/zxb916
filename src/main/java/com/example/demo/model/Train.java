@@ -9,30 +9,49 @@ public class Train {
     /**
      * 主键id
      */
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     /**
      * 开始时间
      */
+    @Column(name = "start_time")
     private Date startTime;
     /**
      * 结束时间
      */
+    @Column(name = "end_time")
     private Date endTime;
     /**
      * 所在单位
      */
+    @Column(name = "unit")
     private String unit;
     /**
      * 培训专业名称
      */
+    @Column(name = "major_name")
     private String majorName;
     /**
      * 标准学时数
      */
+    @Column(name = "count")
     private int count;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+
     public Long getId() {
         return id;
     }
@@ -41,7 +60,7 @@ public class Train {
         this.id = id;
     }
 
-    @Column(name = "start_time")
+
     public Date getStartTime() {
         return startTime;
     }
@@ -50,7 +69,7 @@ public class Train {
         this.startTime = startTime;
     }
 
-    @Column(name = "end_time")
+
     public Date getEndTime() {
         return endTime;
     }
@@ -59,7 +78,7 @@ public class Train {
         this.endTime = endTime;
     }
 
-    @Column(name = "unit")
+
     public String getUnit() {
         return unit;
     }
@@ -68,7 +87,7 @@ public class Train {
         this.unit = unit;
     }
 
-    @Column(name = "major_name")
+
     public String getMajorName() {
         return majorName;
     }
@@ -77,7 +96,7 @@ public class Train {
         this.majorName = majorName;
     }
 
-    @Column(name = "count")
+
     public int getCount() {
         return count;
     }

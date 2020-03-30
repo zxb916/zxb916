@@ -9,12 +9,15 @@ import com.example.demo.common.Constants;
 import com.example.demo.component.JwtTokenUtil;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
+import com.example.demo.util.PageUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Api(value = "用户")
 @RestController
@@ -159,6 +163,24 @@ public class UserController extends BaseController {
             e.printStackTrace();
         }
         return new BaseResult(Constants.RESPONSE_CODE_200, "ok", user);
+    }
+
+
+    //根据编号查询
+    @ApiOperation(value = "根据ID查询用户信息")
+    @PostMapping(value = "/findById")
+    User findById(@RequestParam(value = "id") Long id) {
+        Optional<User> user = userService.getItem(id);
+        return user.get();
+    }
+
+    @ApiOperation(value = "查询所有")
+    @PostMapping(value = "/findAll")
+        //currentPage 当前页，默认为0，如果传1的话是查的第二页数据
+        //pageSize 每页数据条数
+    Page<User> findAll(@RequestParam(value = "currentPage") int currentPage, @RequestParam(value = "pageSize") int pageSize) {
+        Pageable pageable = PageUtil.getPageable(currentPage, pageSize, "datetime");
+        return userService.findAll(pageable);
     }
 
 }

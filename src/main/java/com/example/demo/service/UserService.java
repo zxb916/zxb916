@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.bo.AdminUserDetails;
 import com.example.demo.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -55,5 +57,10 @@ public interface UserService {
      */
     void update(User user);
 
+
+    /**
+     * 分页查询用户信息
+     */
+    Page<User> findAll(Pageable pageable);
 
 }

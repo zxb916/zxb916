@@ -6,6 +6,8 @@ import org.springframework.data.annotation.CreatedDate;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "user")
@@ -72,12 +74,37 @@ public class User {
     @Column(name = "create_time")
     @CreatedDate
     private Timestamp createTime;
+
     /**
      * 用户元信息
      */
     @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = UserExt.class)
     private UserExt userExt;
+
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Resume.class, mappedBy = "id")
+    private Set<Resume> resumes = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Train.class, mappedBy = "id")
+    private Set<Train> trains = new HashSet<>();
+
+    public Set<Train> getTrains() {
+        return trains;
+    }
+
+    public void setTrains(Set<Train> trains) {
+        this.trains = trains;
+    }
+
+
+    public Set<Resume> getResumes() {
+        return resumes;
+    }
+
+    public void setResumes(Set<Resume> resumes) {
+        this.resumes = resumes;
+    }
 
 
     public Long getId() {
@@ -188,4 +215,11 @@ public class User {
     }
 
 
+    public UserExt getUserExt() {
+        return userExt;
+    }
+
+    public void setUserExt(UserExt userExt) {
+        this.userExt = userExt;
+    }
 }
