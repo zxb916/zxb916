@@ -187,11 +187,5 @@ public class User {
         this.createTime = createTime;
     }
 
-    public UserExt getUserMeta() {
-        return userExt;
-    }
 
-    public void setUserMeta(UserExt userMeta) {
-        this.userExt = userExt;
-    }
 }
