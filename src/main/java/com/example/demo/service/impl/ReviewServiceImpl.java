@@ -6,6 +6,9 @@ import com.example.demo.model.User;
 import com.example.demo.repository.ReviewRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.ReviewService;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
@@ -18,14 +21,11 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -35,21 +35,32 @@ public class ReviewServiceImpl implements ReviewService {
     @Autowired
     private UserRepository userRepository;
 
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    private static final String PATH_DOC_TEMPLATE = "/";
+
+    private Configuration ftlConfig = null;
+
+    public ReviewServiceImpl() {
+        ftlConfig = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
+        ftlConfig.setDefaultEncoding("utf-8");
+    }
+
     @Override
     public List<JSONObject> getList(String alreadyWorkType, String createTime) {
-        List<SignUp> SignUpList = reviewRepository.getList(alreadyWorkType, createTime);
+        List<SignUp> signupList = reviewRepository.getList(alreadyWorkType, createTime);
         List<JSONObject> result = new ArrayList<>();
-        for (SignUp SignUp : SignUpList) {
-            Optional<User> opt = userRepository.findById(SignUp.getUserId());
+        for (SignUp signup : signupList) {
+            Optional<User> opt = userRepository.findById(signup.getUser().getId());
             User user = opt.get();
             JSONObject obj = new JSONObject();
             obj.put("userName", user.getUserName());
             obj.put("idCard", user.getIdCard());
             obj.put("soldierId", user.getSoldierId());
-            obj.put("applyWorkType", SignUp.getApplyWorkType());
-            obj.put("applySkillRank", SignUp.getApplySkillRank());
-            obj.put("check", SignUp.getReview());
-            obj.put("passCard", SignUp.getPassCard());
+            obj.put("applyWorkType", signup.getApplyWorkType());
+            obj.put("applySkillRank", signup.getApplySkillRank());
+            obj.put("check", signup.getReview());
+            obj.put("passCard", signup.getPassCard());
             result.add(obj);
         }
         return result;
@@ -84,13 +95,13 @@ public class ReviewServiceImpl implements ReviewService {
             return result.setAt1("审核不能为空");
         }
         User user = userRepository.findByIdCardLike(idCard).get(0);
-        SignUp SignUp = reviewRepository.findByUserId(user.getId());
-        SignUp.setReviewoption(reviewOption);
-        SignUp.setAuditOpinion(auditOpinion);
-        SignUp.setBusinessCheck(businessCheck);
-        SignUp.setSoldiersCheck(soldiersCheck);
-        SignUp.setReview(check);
-        reviewRepository.saveAndFlush(SignUp);
+        SignUp signup = reviewRepository.findByUserId(user.getId());
+        signup.setReviewOption(reviewOption);
+        signup.setAuditOpinion(auditOpinion);
+        signup.setBusinessCheck(businessCheck);
+        signup.setSoldiersCheck(soldiersCheck);
+        signup.setReview(check);
+        reviewRepository.saveAndFlush(signup);
         return result.setAt0(false).setAt1("审核成功");
     }
 
@@ -132,18 +143,18 @@ public class ReviewServiceImpl implements ReviewService {
         String applyWorkType = param.get("applyWorkType").toString();
         String createTime = param.get("createTime").toString();
         List<SignUp> reviewList = reviewRepository.getReviewList(applyWorkType, createTime);
-        for (SignUp SignUp : reviewList) {
+        for (SignUp signup : reviewList) {
             JSONObject result = new JSONObject();
-            User user = userRepository.findById(SignUp.getUserId()).get();
+            User user = userRepository.findById(signup.getUser().getId()).get();
             result.put("userName", user.getUserName());
             result.put("sex", user.getUserExt().getSex());
-            result.put("deptNo", user.getDeptno());
+            result.put("deptNo", user.getDeptNo());
             result.put("joinTime", user.getJoinTime());
             result.put("armedRank", user.getArmedRank());
             result.put("soldierId", user.getSoldierId());
             result.put("idCard", user.getIdCard());
             result.put("degree", user.getUserExt().getDegree());
-            result.put("applySkillRank", SignUp.getApplySkillRank());
+            result.put("applySkillRank", signup.getApplySkillRank());
             resultlist.add(result);
         }
         return resultlist;
@@ -229,5 +240,91 @@ public class ReviewServiceImpl implements ReviewService {
         workbook.write(outputStream);
         outputStream.flush();
         outputStream.close();
+    }
+
+
+    @Override
+    public File build(String idCard, String createTime) {
+        User user = userRepository.findByIdCardLike(idCard).get(0);
+        SignUp signup = null;
+        for (SignUp sign : user.getSignUps()) {
+            if (StringUtils.startsWith(sdf.format(sign.getCreateTime()), createTime)) {
+                signup = sign;
+            }
+        }
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("name", "solider");
+        resultMap.put("applyWorkType", signup.getApplyWorkType());
+        resultMap.put("userName", user.getUserName());
+        resultMap.put("createTime", sdf.format(signup.getCreateTime()));
+        resultMap.put("userName", user.getUserName());
+        resultMap.put("sex", user.getUserExt().getSex());
+        resultMap.put("profilePhoto", user.getUserExt().getProfilePhoto());
+        resultMap.put("idCard", user.getIdCard());
+        resultMap.put("birthday", sdf.format(user.getUserExt().getBirthdy()));
+        resultMap.put("soldierId", user.getSoldierId());
+        resultMap.put("degree", user.getUserExt().getDegree());
+        resultMap.put("deptno", user.getDeptNo());
+        resultMap.put("mobile", user.getMobile());
+        resultMap.put("mailingAddress", user.getMailingAddress());
+        resultMap.put("postCode", user.getUserExt().getPostCode());
+        resultMap.put("alreadyWorkType", signup.getAlreadyWorkType());
+        resultMap.put("alreadySkillRank", signup.getApplySkillRank());
+        resultMap.put("alreadyCertificateNo", signup.getAlreadyCertificateNo());
+        resultMap.put("alreadyIssueDate", sdf.format(signup.getAlreadyIssueDate()));
+        resultMap.put("applyWorkType", signup.getApplyWorkType());
+        resultMap.put("applySkillRank", signup.getApplySkillRank());
+        for (int i = 1; i <= 4; i++) {
+            if (user.getResumes().size() >= i) {
+                resultMap.put("startTime" + i, sdf.format(user.getResumes().get(i - 1).getStartTime()));
+                resultMap.put("endTime" + i, sdf.format(user.getResumes().get(i - 1).getEndTime()));
+                resultMap.put("unit" + i, user.getResumes().get(i - 1).getUnit());
+                resultMap.put("majorName" + i, user.getResumes().get(i - 1).getMajorName());
+            } else {
+                resultMap.put("startTime" + i, "");
+                resultMap.put("endTime" + i, "");
+                resultMap.put("unit" + i, "");
+                resultMap.put("majorName" + i, "");
+            }
+        }
+        for (int i = 1; i <= 4; i++) {
+            if (user.getTrains().size() >= i) {
+                resultMap.put("startTime" + i, sdf.format(user.getTrains().get(i - 1).getStartTime()));
+                resultMap.put("endTime" + i, sdf.format(user.getTrains().get(i - 1).getEndTime()));
+                resultMap.put("unit" + i, user.getTrains().get(i - 1).getUnit());
+                resultMap.put("majorName" + i, user.getTrains().get(i - 1).getMajorName());
+                resultMap.put("count" + i, user.getTrains().get(i - 1).getCount());
+            } else {
+                resultMap.put("startTime" + i, "");
+                resultMap.put("endTime" + i, "");
+                resultMap.put("unit" + i, "");
+                resultMap.put("majorName" + i, "");
+                resultMap.put("count" + i, "");
+            }
+        }
+        return buildDoc(resultMap, "solider.ftl");
+    }
+
+    @SuppressWarnings("deprecation")
+    public File buildDoc(Map<String, Object> reportMap, String templateName) {
+        Template template = null;
+        Writer writer = null;
+        File docFile = null;
+        try {
+            ftlConfig.setClassForTemplateLoading(this.getClass(), PATH_DOC_TEMPLATE);
+            template = ftlConfig.getTemplate(templateName, "utf-8");
+            docFile = new File(String.valueOf(reportMap.get("name")).concat(".doc"));
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(docFile), "utf-8"));
+            template.process(reportMap, writer);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (TemplateException e) {
+            e.printStackTrace();
+        } finally {
+            IOUtils.closeQuietly(writer);
+        }
+        return docFile;
     }
 }

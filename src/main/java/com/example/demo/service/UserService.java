@@ -63,4 +63,15 @@ public interface UserService {
      */
     Page<User> findAll(Pageable pageable);
 
+    /**
+     * 根据idCard或userName 查询用户
+     */
+    AdminUserDetails getAdminByUserNameOrIdCard(String str);
+
+    /**
+     * 删除用户
+     * @param user
+     */
+    void delete(User user);
+
 }

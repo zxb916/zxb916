@@ -24,4 +24,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
     List<User> findByIdCardLike(String idCard);
 
     Page<User> findAll(@PageableDefault(value = 15, sort = {"datetime"}, direction = Sort.Direction.DESC) Pageable pageable);
+
+    @Override
+    void delete(User user);
 }

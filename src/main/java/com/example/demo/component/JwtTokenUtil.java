@@ -1,10 +1,13 @@
 package com.example.demo.component;
 
+import com.example.demo.bo.AdminUserDetails;
+import com.example.demo.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -34,6 +37,9 @@ public class JwtTokenUtil {
     @Value("${jwt.expiration}")
     private Long expiration;
 
+    @Autowired
+    private UserService userService;
+
     /**
      * 根据负责生成JWT的token
      */
@@ -56,7 +62,7 @@ public class JwtTokenUtil {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {
-            LOGGER.info("JWT格式验证失败:{}",token);
+            LOGGER.info("JWT格式验证失败:{}", token);
         }
         return claims;
     }
@@ -75,7 +81,7 @@ public class JwtTokenUtil {
         String username;
         try {
             Claims claims = getClaimsFromToken(token);
-            username =  claims.getSubject();
+            username = claims.getSubject();
         } catch (Exception e) {
             username = null;
         }
@@ -133,5 +139,15 @@ public class JwtTokenUtil {
         Claims claims = getClaimsFromToken(token);
         claims.put(CLAIM_KEY_CREATED, new Date());
         return generateToken(claims);
+    }
+
+
+    /**
+     * 获取user对象
+     */
+    public AdminUserDetails getAdminByToken(String token) {
+        String userName = getUserNameFromToken(token);
+        AdminUserDetails adminUserDetails = userService.getAdminByUserNameOrIdCard(userName);
+        return adminUserDetails;
     }
 }

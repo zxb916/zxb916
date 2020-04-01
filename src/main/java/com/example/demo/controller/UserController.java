@@ -105,18 +105,13 @@ public class UserController extends BaseController {
     @ApiOperation(value = "修改密码")
     @PostMapping(value = "/changePassword", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Object changePassword(@RequestBody String str) {
+    public Object changePassword(@RequestBody String str, HttpServletRequest request) {
         logger.info("修改密码", str);
-
+        AdminUserDetails adminUserDetails = jwtTokenUtil.getAdminByToken(request.getHeader(tokenHeader));
         try {
             Map<String, String> object = (Map<String, String>) JSONObject.parse(str);
-            String idCard = object.get("idCard");
             String oldPassword = object.get("oldPassword");
             String newPassword = object.get("newPassword");
-            AdminUserDetails adminUserDetails = userService.getAdminByIdCard(idCard);
-            if (adminUserDetails == null) {
-                return new UsernameNotFoundException("用户不存在");
-            }
             User user = adminUserDetails.getUser();
             if (!BCrypt.checkpw(oldPassword, user.getPassword()))
                 return new UsernameNotFoundException("原始密码错误");
@@ -148,17 +143,53 @@ public class UserController extends BaseController {
     }
 
 
+    @ApiOperation(value = "管理员查询基本信息")
+    @GetMapping(value = "/select")
+    public BaseResult select(@RequestParam("userName") String userName) {
+        logger.info("查询学员基本信息" + userName);
+        User user = null;
+        try {
+            AdminUserDetails adminUserDetails = userService.getAdminByUserNameOrIdCard(userName);
+            if (adminUserDetails == null) {
+                return new BaseResult(Constants.RESPONSE_CODE_404, "用户不存在");
+            }
+            user = adminUserDetails.getUser();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new BaseResult(Constants.RESPONSE_CODE_200, "ok", user);
+    }
+
+
     @ApiOperation(value = "查询学员基本信息")
     @GetMapping(value = "/getOne")
     public BaseResult getOne(@RequestParam("idCard") String idCard) {
         logger.info("查询学员基本信息" + idCard);
         User user = null;
         try {
-            AdminUserDetails adminUserDetails = userService.getAdminByIdCard(idCard);
+            AdminUserDetails adminUserDetails = userService.getAdminByUserNameOrIdCard(idCard);
             if (adminUserDetails == null) {
                 return new BaseResult(Constants.RESPONSE_CODE_404, "用户不存在");
             }
             user = adminUserDetails.getUser();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new BaseResult(Constants.RESPONSE_CODE_200, "ok", user);
+    }
+
+
+    @ApiOperation(value = "修改学员基本信息")
+    @PostMapping(value = "/edit")
+    public BaseResult edit(@RequestBody User user) {
+        logger.info("查询学员基本信息" + user);
+        try {
+            User user1 = userService.getItem(user.getId()).get();
+
+
+            if (user == null) {
+                return new BaseResult(Constants.RESPONSE_CODE_404, "用户不存在");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -182,5 +213,19 @@ public class UserController extends BaseController {
         Pageable pageable = PageUtil.getPageable(currentPage, pageSize, "datetime");
         return userService.findAll(pageable);
     }
+
+    @ApiOperation(value = "删除用户")
+    @PostMapping(value = "/delete")
+    public BaseResult deleteUser(@RequestBody User user) {
+        AdminUserDetails adminUserDetails = userService.getAdminByUserNameOrIdCard(user.getIdCard());
+        user = adminUserDetails.getUser();
+        if (user.getId() == null) {
+            return new BaseResult(Constants.RESPONSE_CODE_200, "用户不存在");
+        }
+        userService.delete(user);
+        return new BaseResult(Constants.RESPONSE_CODE_200, "删除用户成功");
+
+    }
+
 
 }

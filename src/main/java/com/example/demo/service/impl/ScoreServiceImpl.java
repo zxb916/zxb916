@@ -71,15 +71,15 @@ public class ScoreServiceImpl implements ScoreService {
         for (SignUp signUp : signUpList) {
             JSONObject object = new JSONObject();
             Score score = scoreRepository.getScore(signUp.getId());
-            User user = userRepository.findById(signUp.getUserId()).get();
+            User user = userRepository.findById(signUp.getUser().getId()).get();
             UserExt userExt = userExtRepository.getOne(user.getId());
-            object.put("userId", signUp.getUserId());
+            object.put("userId", signUp.getUser().getId());
             object.put("userName", user.getUserName());
             object.put("idCard", user.getIdCard());
             object.put("soldierId", user.getSoldierId());
             object.put("alreadyWorkType", signUp.getAlreadyWorkType());
             object.put("alreadySkillRank", signUp.getAlreadySkillRank());
-            object.put("Deptno", user.getDeptno());
+            object.put("Deptno", user.getDeptNo());
             object.put("armedRank", user.getArmedRank());
             object.put("passCard", userExt.getPostCode());
             object.put("theoryScore", score.getTheoryScore());

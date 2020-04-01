@@ -5,6 +5,7 @@ import org.javatuples.Pair;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.util.List;
 
 public interface ReviewService {
@@ -22,4 +23,12 @@ public interface ReviewService {
      * 生成报表
      */
     void exportExcel(HttpServletRequest request, HttpServletResponse response) throws Exception;
+
+    /**
+     * 生成报名表
+     *
+     * @param idCard
+     * @return
+     */
+    File build(String idCard, String createTime);
 }

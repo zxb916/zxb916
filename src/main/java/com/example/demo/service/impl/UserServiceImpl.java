@@ -121,5 +121,23 @@ public class UserServiceImpl implements UserService {
         return adminMapper.findAll(pageable);
     }
 
+    @Override
+    public AdminUserDetails getAdminByUserNameOrIdCard(String str) {
+        AdminUserDetails adminUserDetails = null;
+        adminUserDetails = getAdminByIdCard(str);
+        if (adminUserDetails == null) {
+            adminUserDetails = getAdminByUsername(str);
+        }
+        if (adminUserDetails == null) {
+            return null;
+        }
+        return adminUserDetails;
+    }
+
+    @Override
+    public void delete(User user) {
+        adminMapper.delete(user);
+    }
+
 
 }

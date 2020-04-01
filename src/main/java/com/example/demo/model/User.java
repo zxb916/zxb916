@@ -6,8 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -42,7 +41,7 @@ public class User {
      * 军衔
      */
     @Column(name = "armed_rank")
-    private ArmedRankType armedRank;
+    private String armedRank;
     /**
      * 联系电话
      */
@@ -52,7 +51,7 @@ public class User {
      * 部号
      */
     @Column(name = "dept_no")
-    private String deptno;
+    private String deptNo;
     /**
      * 通信地址
      */
@@ -79,33 +78,48 @@ public class User {
      * 用户元信息
      */
     @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = UserExt.class)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = UserExt.class)
     private UserExt userExt;
 
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Resume.class)
+    private List<Resume> resumes;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Resume.class, mappedBy = "id")
-    private Set<Resume> resumes = new HashSet<>();
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Train.class)
+    private List<Train> trains;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Train.class, mappedBy = "id")
-    private Set<Train> trains = new HashSet<>();
+    /**
+     * 用户报名信息
+     */
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = SignUp.class)
+    private List<SignUp> signUps;
 
-    public Set<Train> getTrains() {
-        return trains;
+
+    public List<SignUp> getSignUps() {
+        return signUps;
     }
 
-    public void setTrains(Set<Train> trains) {
-        this.trains = trains;
+    public void setSignUps(List<SignUp> signUps) {
+        this.signUps = signUps;
     }
 
-
-    public Set<Resume> getResumes() {
+    public List<Resume> getResumes() {
         return resumes;
     }
 
-    public void setResumes(Set<Resume> resumes) {
+    public void setResumes(List<Resume> resumes) {
         this.resumes = resumes;
     }
 
+    public List<Train> getTrains() {
+        return trains;
+    }
+
+    public void setTrains(List<Train> trains) {
+        this.trains = trains;
+    }
 
     public Long getId() {
         return id;
@@ -152,14 +166,13 @@ public class User {
     }
 
 
-    public ArmedRankType getArmedRank() {
+    public String getArmedRank() {
         return armedRank;
     }
 
-    public void setArmedRank(ArmedRankType armedRank) {
+    public void setArmedRank(String armedRank) {
         this.armedRank = armedRank;
     }
-
 
     public String getMobile() {
         return mobile;
@@ -170,14 +183,13 @@ public class User {
     }
 
 
-    public String getDeptno() {
-        return deptno;
+    public String getDeptNo() {
+        return deptNo;
     }
 
-    public void setDeptno(String deptno) {
-        this.deptno = deptno;
+    public void setDeptNo(String deptNo) {
+        this.deptNo = deptNo;
     }
-
 
     public String getMailingAddress() {
         return mailingAddress;

@@ -41,6 +41,11 @@ public class UserExt {
     @Column(name = "profile_photo")
     private String profilePhoto;
 
+    @Column(name = "政治面貌")
+    private String political;
+
+    @Column(name = "work_time")
+    private Integer workTime;
 
     @JsonBackReference
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = User.class)
@@ -105,5 +110,21 @@ public class UserExt {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getPolitical() {
+        return political;
+    }
+
+    public void setPolitical(String political) {
+        this.political = political;
+    }
+
+    public Integer getWorkTime() {
+        return workTime;
+    }
+
+    public void setWorkTime(Integer workTime) {
+        this.workTime = workTime;
     }
 }
