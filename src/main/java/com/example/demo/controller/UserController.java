@@ -23,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -107,23 +106,24 @@ public class UserController extends BaseController {
     @ApiOperation(value = "修改密码")
     @PostMapping(value = "/changePassword", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Object changePassword(@RequestBody String str, HttpServletRequest request) {
+    public BaseResult changePassword(@RequestBody String str, HttpServletRequest request) {
         logger.info("修改密码", str);
-        AdminUserDetails adminUserDetails = jwtTokenUtil.getAdminByToken(request.getHeader(tokenHeader));
+        AdminUserDetails adminUserDetails = jwtTokenUtil.getAdminByToken(request.getHeader(tokenHeader).substring(this.tokenHead.length()));
         try {
             Map<String, String> object = (Map<String, String>) JSONObject.parse(str);
             String oldPassword = object.get("oldPassword");
             String newPassword = object.get("newPassword");
             User user = adminUserDetails.getUser();
             if (!BCrypt.checkpw(oldPassword, user.getPassword()))
-                return new UsernameNotFoundException("原始密码错误");
+                return new BaseResult(Constants.RESPONSE_CODE_404, "原始密码错误");
+            user.setOldPassword(newPassword);
             String hashed = BCrypt.hashpw(newPassword, BCrypt.gensalt(12));
             user.setPassword(hashed);
             userService.update(user);
         } catch (Exception e) {
-            return ResponseEntity.ok(new BaseResult(Constants.RESPONSE_CODE_500, "数据库异常"));
+            return new BaseResult(Constants.RESPONSE_CODE_500, "数据库异常");
         }
-        return ResponseEntity.ok(new BaseResult(Constants.RESPONSE_CODE_200, "修改密码成功"));
+        return new BaseResult(Constants.RESPONSE_CODE_200, "修改密码成功");
     }
 
     @ApiOperation(value = "重置密码")

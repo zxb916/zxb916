@@ -1,6 +1,6 @@
 package com.example.demo.model;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -64,7 +64,7 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @JSONField(serialize = false)
+    @JsonIgnore
     @Column(name = "old_password")
     private String oldPassword;
 
