@@ -8,7 +8,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+
 public interface ScoreService {
     ArrayList<Object> getUserScore(String idCard, String year);
 
