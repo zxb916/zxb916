@@ -23,8 +23,8 @@ public class UserExt {
     /**
      * 生日
      */
-    @Column(name = "birthdy")
-    private Date birthdy;
+    @Column(name = "birthday")
+    private Date birthday;
     /**
      * 文化程度
      */
@@ -69,14 +69,13 @@ public class UserExt {
     }
 
 
-    public Date getBirthdy() {
-        return birthdy;
+    public Date getBirthday() {
+        return birthday;
     }
 
-    public void setBirthdy(Date birthdy) {
-        this.birthdy = birthdy;
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
     }
-
 
     public String getDegree() {
         return degree;

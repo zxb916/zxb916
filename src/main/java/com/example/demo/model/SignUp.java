@@ -2,6 +2,7 @@ package com.example.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -85,8 +86,8 @@ public class SignUp {
     /**
      * 创建时间
      */
+    @CreationTimestamp
     @Column(name = "create_time")
-    @Temporal(value = TemporalType.TIMESTAMP)
     private Date createTime;
     /**
      * 团级以上单位资格审查意见
@@ -269,4 +270,5 @@ public class SignUp {
     public void setScore(Score score) {
         this.score = score;
     }
+
 }

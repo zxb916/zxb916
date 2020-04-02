@@ -35,7 +35,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Autowired
     private UserRepository userRepository;
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
 
     private static final String PATH_DOC_TEMPLATE = "/";
 
@@ -248,7 +248,7 @@ public class ReviewServiceImpl implements ReviewService {
         User user = userRepository.findByIdCardLike(idCard).get(0);
         SignUp signup = null;
         for (SignUp sign : user.getSignUps()) {
-            if (StringUtils.startsWith(sdf.format(sign.getCreateTime()), createTime)) {
+            if (StringUtils.startsWith(createTime, sdf.format(sign.getCreateTime()))) {
                 signup = sign;
             }
         }
@@ -261,7 +261,7 @@ public class ReviewServiceImpl implements ReviewService {
         resultMap.put("sex", user.getUserExt().getSex());
         resultMap.put("profilePhoto", user.getUserExt().getProfilePhoto());
         resultMap.put("idCard", user.getIdCard());
-        resultMap.put("birthday", sdf.format(user.getUserExt().getBirthdy()));
+        resultMap.put("birthday", sdf.format(user.getUserExt().getBirthday()));
         resultMap.put("soldierId", user.getSoldierId());
         resultMap.put("degree", user.getUserExt().getDegree());
         resultMap.put("deptno", user.getDeptNo());
