@@ -18,12 +18,24 @@ public class AdminUserDetails implements UserDetails {
 
     private User user;
 
+
+    private String idCard;
+
+
     public AdminUserDetails(User user) {
         this.user = user;
     }
 
     public User getUser() {
         return user;
+    }
+
+    public String getIdCard() {
+        return idCard;
+    }
+
+    public void setIdCard(String idCard) {
+        this.idCard = idCard;
     }
 
     @Override
@@ -41,6 +53,9 @@ public class AdminUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
+        if (this.getIdCard() != null) {
+            return user.getIdCard();
+        }
         return user.getUserName();
     }
 

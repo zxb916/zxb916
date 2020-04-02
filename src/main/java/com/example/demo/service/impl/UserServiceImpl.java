@@ -17,7 +17,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -72,6 +71,7 @@ public class UserServiceImpl implements UserService {
     public User register(User user) {
         user.setCreateTime(new Timestamp(new Date().getTime()));
         user.setIsAdmin(RoleType.ADMIN);
+        user.setOldPassword(user.getPassword());
         //查询是否有相同用户名的用户
         //将密码进行加密操作
         String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(12));
@@ -88,7 +88,7 @@ public class UserServiceImpl implements UserService {
         try {
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            AdminUserDetails userDetails = (AdminUserDetails) userDetailsService.loadUserByUsername(username);
             token = jwtTokenUtil.generateToken(userDetails);
         } catch (AuthenticationException e) {
             LOGGER.warn("登录异常:{}", e.getMessage());

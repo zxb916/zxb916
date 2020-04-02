@@ -9,11 +9,13 @@ import com.example.demo.common.Constants;
 import com.example.demo.component.JwtTokenUtil;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
+import com.example.demo.util.BeanCopy;
 import com.example.demo.util.PageUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -143,6 +145,22 @@ public class UserController extends BaseController {
     }
 
 
+    @ApiOperation(value = "获取用户密码")
+    @GetMapping(value = "/getPassword")
+    public BaseResult getPassword(@RequestParam("idCard") String idCard) {
+        logger.info("获取用户密码" + idCard);
+        if (idCard == null) {
+            return new BaseResult(Constants.RESPONSE_CODE_500, "idCard不能为null");
+        }
+        AdminUserDetails adminUserDetails = userService.getAdminByIdCard(idCard);
+        if (adminUserDetails == null) {
+            return new BaseResult(Constants.RESPONSE_CODE_404, "该用户不存在");
+        }
+        User user = adminUserDetails.getUser();
+        return new BaseResult(Constants.RESPONSE_CODE_200, "success", user.getOldPassword());
+    }
+
+
     @ApiOperation(value = "管理员查询基本信息")
     @GetMapping(value = "/select")
     public BaseResult select(@RequestParam("userName") String userName) {
@@ -185,15 +203,15 @@ public class UserController extends BaseController {
         logger.info("查询学员基本信息" + user);
         try {
             User user1 = userService.getItem(user.getId()).get();
-
-
-            if (user == null) {
+            if (user1 == null) {
                 return new BaseResult(Constants.RESPONSE_CODE_404, "用户不存在");
             }
+            BeanUtils.copyProperties(user, user1, BeanCopy.getNullPropertyNames(user));
+            userService.update(user1);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new BaseResult(Constants.RESPONSE_CODE_200, "ok", user);
+        return new BaseResult(Constants.RESPONSE_CODE_200, "ok");
     }
 
 

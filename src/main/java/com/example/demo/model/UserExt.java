@@ -41,7 +41,7 @@ public class UserExt {
     @Column(name = "profile_photo")
     private String profilePhoto;
 
-    @Column(name = "政治面貌")
+    @Column(name = "political")
     private String political;
 
     @Column(name = "work_time")

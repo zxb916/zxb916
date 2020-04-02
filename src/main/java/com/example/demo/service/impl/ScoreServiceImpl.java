@@ -11,6 +11,7 @@ import com.example.demo.repository.SignUpRepository;
 import com.example.demo.repository.UserExtRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.ScoreService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
@@ -23,14 +24,16 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
 public class ScoreServiceImpl implements ScoreService {
     //打印log日志
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     @Autowired
     private ScoreRepository scoreRepository;
     @Autowired
@@ -41,38 +44,42 @@ public class ScoreServiceImpl implements ScoreService {
     private UserExtRepository userExtRepository;
 
 
+    //学生端获取成绩
     @Override
-    public ArrayList<Object> getUserScore(String idCard, Date createTime) {
+    public ArrayList<Object> getUserScore(String idCard, String  year) {
         ArrayList<Object> result = new ArrayList<>();
 //        Optional<User> byId = userRepository.findById(1L);
         User user = userRepository.findByIdCardLike(idCard).get(0);
-        List<SignUp> signUps = signUpRepository.getList(user.getId(), createTime);
-        for (SignUp signUp : signUps) {
-            JSONObject object = new JSONObject();
-            Score userScore = scoreRepository.getUserScore(signUp.getId());
-            object.put("userName", user.getUserName());
-            object.put("alreadyWorkType", signUp.getAlreadyWorkType());
-            object.put("alreadySkillRank", signUp.getAlreadySkillRank());
-            object.put("theoryScore", userScore.getTheoryScore());
-            object.put("operationScore", userScore.getOperationScore());
-            object.put("overallScore", userScore.getOverallScore());
-            object.put("finalResult", userScore.getFinalResult());
-            object.put("certificateNo", userScore.getCertificateNo());
-            result.add(object);
+        List<SignUp> signUpsList = user.getSignUps();
+        for (SignUp signUp : signUpsList) {
+            if (!StringUtils.startsWith(sdf.format(signUp.getCreateTime()), year)){
+                JSONObject object = new JSONObject();
+                Score userScore = scoreRepository.getUserScore(signUp.getId());
+                object.put("userName", user.getUserName());
+                object.put("alreadyWorkType", signUp.getAlreadyWorkType());
+                object.put("alreadySkillRank", signUp.getAlreadySkillRank());
+                object.put("theoryScore", userScore.getTheoryScore());
+                object.put("operationScore", userScore.getOperationScore());
+                object.put("overallScore", userScore.getOverallScore());
+                object.put("finalResult", userScore.getFinalResult());
+                object.put("certificateNo", userScore.getCertificateNo());
+                result.add(object);
+            }
         }
         return result;
     }
 
+    //教师端获取成绩
     @Override
-    public List<Object> getUserScoreList(String alreadyWorkType, Date createTime) {
+    public List<Object> getUserScoreList(String applyWorkType, String  year) {
         ArrayList<Object> result = new ArrayList<>();
-//        List<SignUp> signUpList = signUpRepository.getSignUpList(alreadyWorkType, createTime);
-        List<SignUp> signUpList = signUpRepository.getSignUpList(alreadyWorkType);
+        List<SignUp> signUpList = signUpRepository.getSignUpList(applyWorkType, year);
         for (SignUp signUp : signUpList) {
             JSONObject object = new JSONObject();
-            Score score = scoreRepository.getScore(signUp.getId());
-            User user = userRepository.findById(signUp.getUser().getId()).get();
-            UserExt userExt = userExtRepository.getOne(user.getId());
+            Score score = signUp.getScore();
+            User user = signUp.getUser();
+            UserExt userExt = signUp.getUser().getUserExt();
+            object.put("id",signUp.getId());
             object.put("userId", signUp.getUser().getId());
             object.put("userName", user.getUserName());
             object.put("idCard", user.getIdCard());
@@ -87,30 +94,33 @@ public class ScoreServiceImpl implements ScoreService {
             object.put("overallScore", score.getOverallScore());
             object.put("finalResult", score.getFinalResult());
             object.put("certificateNo", score.getCertificateNo());
-            object.put("createTime", score.getCreate_time());
             result.add(object);
         }
         return result;
     }
 
     @Override
-    public void insert(String idCard, Long theoryScore, Long operationScore, Long overallScore, String finalResult) {
+    public void insert(String idCard, Long theoryScore, Long operationScore, Long overallScore, String finalResult,String creatTime) {
         User user = userRepository.findByIdCardLike(idCard).get(0);
-        SignUp signUp = signUpRepository.getOne(user.getId());
-        Score score = scoreRepository.getScore(signUp.getId());
-        score.setTheoryScore(theoryScore);
-        score.setOperationScore(operationScore);
-        score.setOverallScore(overallScore);
-        score.setFinalResult(finalResult);
-        scoreRepository.save(score);
+        List<SignUp> signUpsList = user.getSignUps();
+        for (SignUp signUp : signUpsList) {
+            if (!StringUtils.startsWith(sdf.format(signUp.getCreateTime()), creatTime)) {
+                Score score = signUp.getScore();
+                score.setTheoryScore(theoryScore);
+                score.setOperationScore(operationScore);
+                score.setOverallScore(overallScore);
+                score.setFinalResult(finalResult);
+                scoreRepository.save(score);
+            }
+        }
     }
 
     @Override
-    public void export(HttpServletResponse response, String alreadyWorkType, Date createTime) throws Exception {
+    public void export(HttpServletResponse response, String applyWorkType, String createTime) throws Exception {
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("学生成绩表");
         createTitle(workbook, sheet);
-        List<Object> userScoreList = getUserScoreList(alreadyWorkType, createTime);
+        List<Object> userScoreList = getUserScoreList(applyWorkType, createTime);
         HSSFRow row = sheet.createRow(userScoreList.size() + 1);
         int count = 1;
         for (Object object : userScoreList) {

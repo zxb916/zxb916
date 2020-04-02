@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Api(value = "查询成绩信息")
@@ -35,16 +34,16 @@ public class ScoreSearchComtroller extends BaseController {
     //学生端成绩查询
     @ApiOperation(value = "学生端根据身份证号和创建时间获取学生成绩")
     @GetMapping(value = "/select")
-    public BaseResult select(@RequestParam String idCard, @RequestParam Date createTime) {
-        ArrayList<Object> userScore = scoreService.getUserScore(idCard, createTime);
+    public BaseResult select(@RequestParam String idCard, @RequestParam String year) {
+        ArrayList<Object> userScore = scoreService.getUserScore(idCard, year);
         return new BaseResult(Constants.RESPONSE_CODE_200, "获取成功", userScore);
     }
 
     //教师端成绩查询
     @ApiOperation(value = "教师端根据工种和创建时间获取学生成绩")
-    @GetMapping(value = "/selectList")
-    public BaseResult selectList(@RequestParam String alreadyWorkType, @RequestParam Date createTime) {
-        List<Object> userScore = selectScore(alreadyWorkType, createTime);
+    @GetMapping(value = "/adminSelect")
+    public BaseResult selectList(@RequestParam String applyWorkType, @RequestParam String year) {
+        List<Object> userScore = selectScore(applyWorkType, year);
         return new BaseResult(Constants.RESPONSE_CODE_200, "获取成功", userScore);
     }
 
@@ -63,7 +62,8 @@ public class ScoreSearchComtroller extends BaseController {
             Long operationScore = Long.parseLong(object.getString("operationScore"));
             Long overallScore = Long.parseLong(object.getString("overallScore"));
             String finalResult = object.getString("finalResult");
-            scoreService.insert(idCard, theoryScore, operationScore, overallScore, finalResult);
+            String creatTime = object.getString("creatTime");
+            scoreService.insert(idCard, theoryScore, operationScore, overallScore, finalResult, creatTime);
         } catch (IOException e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -74,7 +74,7 @@ public class ScoreSearchComtroller extends BaseController {
     //成绩导出
     @ApiOperation(value = "导出学生成绩")
     @PostMapping(value = "/export")
-    public BaseResult export(HttpServletResponse response, String alreadyWorkType, Date createTime) throws Exception {
+    public BaseResult export(HttpServletResponse response, String alreadyWorkType, String createTime) throws Exception {
         scoreService.export(response, alreadyWorkType, createTime);
         return new BaseResult(Constants.RESPONSE_CODE_200, "导出成绩成功");
     }
@@ -91,8 +91,8 @@ public class ScoreSearchComtroller extends BaseController {
 
 
     //教师端查询到的成绩
-    private List<Object> selectScore(String alreadyWorkType, Date createTime) {
-        List<Object> userScore = scoreService.getUserScoreList(alreadyWorkType, createTime);
+    private List<Object> selectScore(String applyWorkType, String year) {
+        List<Object> userScore = scoreService.getUserScoreList(applyWorkType, year);
         return userScore;
     }
 }

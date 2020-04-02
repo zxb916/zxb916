@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -48,6 +50,12 @@ public class Score {
     @Column(name = "create_time")
     private Date create_time;
 
+    /**
+     * 报名表
+     */
+    @JsonBackReference
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = User.class)
+    private SignUp signUp;
 
     public Long getId() {
         return id;

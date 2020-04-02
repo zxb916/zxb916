@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -47,10 +48,15 @@ public class SignUp {
     @Column(name = "already_skill_rank")
     private String alreadySkillRank;
     /**
-     * 证书编号
+     * 原证书编号
      */
     @Column(name = "already_certificate_no")
     private String alreadyCertificateNo;
+    /**
+     * 证书编号
+     */
+    @Column(name = "certificate_no")
+    private String certificateNo;
     /**
      * 发证时间
      */
@@ -91,6 +97,10 @@ public class SignUp {
     @Column(name = "choice")
     private String choice;
 
+    //成績表
+    @JsonManagedReference
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = UserExt.class)
+    private Score score;
 
     @JsonBackReference
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = User.class)
@@ -148,6 +158,13 @@ public class SignUp {
         this.alreadyWorkType = alreadyWorkType;
     }
 
+    public String getCertificateNo() {
+        return certificateNo;
+    }
+
+    public void setCertificateNo(String certificateNo) {
+        this.certificateNo = certificateNo;
+    }
 
     public String getAlreadySkillRank() {
         return alreadySkillRank;
@@ -245,4 +262,11 @@ public class SignUp {
         this.user = user;
     }
 
+    public Score getScore() {
+        return score;
+    }
+
+    public void setScore(Score score) {
+        this.score = score;
+    }
 }
