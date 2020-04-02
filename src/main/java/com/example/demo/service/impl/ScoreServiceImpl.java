@@ -46,13 +46,13 @@ public class ScoreServiceImpl implements ScoreService {
 
     //学生端获取成绩
     @Override
-    public ArrayList<Object> getUserScore(String idCard, String  year) {
+    public ArrayList<Object> getUserScore(String idCard, String year) {
         ArrayList<Object> result = new ArrayList<>();
 //        Optional<User> byId = userRepository.findById(1L);
         User user = userRepository.findByIdCardLike(idCard).get(0);
-        List<SignUp> signUpsList = user.getSignUps();
+        List<SignUp> signUpsList = signUpRepository.findByUserId(user.getId());
         for (SignUp signUp : signUpsList) {
-            if (!StringUtils.startsWith(sdf.format(signUp.getCreateTime()), year)){
+            if (!StringUtils.startsWith(sdf.format(signUp.getCreateTime()), year)) {
                 JSONObject object = new JSONObject();
                 Score userScore = scoreRepository.getUserScore(signUp.getId());
                 object.put("userName", user.getUserName());
@@ -71,7 +71,7 @@ public class ScoreServiceImpl implements ScoreService {
 
     //教师端获取成绩
     @Override
-    public List<Object> getUserScoreList(String applyWorkType, String  year) {
+    public List<Object> getUserScoreList(String applyWorkType, String year) {
         ArrayList<Object> result = new ArrayList<>();
         List<SignUp> signUpList = signUpRepository.getSignUpList(applyWorkType, year);
         for (SignUp signUp : signUpList) {
@@ -79,7 +79,7 @@ public class ScoreServiceImpl implements ScoreService {
             Score score = signUp.getScore();
             User user = signUp.getUser();
             UserExt userExt = signUp.getUser().getUserExt();
-            object.put("id",signUp.getId());
+            object.put("id", signUp.getId());
             object.put("userId", signUp.getUser().getId());
             object.put("userName", user.getUserName());
             object.put("idCard", user.getIdCard());
@@ -100,9 +100,9 @@ public class ScoreServiceImpl implements ScoreService {
     }
 
     @Override
-    public void insert(String idCard, Long theoryScore, Long operationScore, Long overallScore, String finalResult,String creatTime) {
+    public void insert(String idCard, Long theoryScore, Long operationScore, Long overallScore, String finalResult, String creatTime) {
         User user = userRepository.findByIdCardLike(idCard).get(0);
-        List<SignUp> signUpsList = user.getSignUps();
+        List<SignUp> signUpsList = signUpRepository.findByUserId(user.getId());
         for (SignUp signUp : signUpsList) {
             if (!StringUtils.startsWith(sdf.format(signUp.getCreateTime()), creatTime)) {
                 Score score = signUp.getScore();

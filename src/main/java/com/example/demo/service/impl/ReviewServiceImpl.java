@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.demo.model.SignUp;
 import com.example.demo.model.User;
 import com.example.demo.repository.ReviewRepository;
+import com.example.demo.repository.SignUpRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.ReviewService;
 import freemarker.template.Configuration;
@@ -34,6 +35,9 @@ public class ReviewServiceImpl implements ReviewService {
     private ReviewRepository reviewRepository;
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private SignUpRepository signUpRepository;
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
 
@@ -247,7 +251,8 @@ public class ReviewServiceImpl implements ReviewService {
     public File build(String idCard, String createTime) {
         User user = userRepository.findByIdCardLike(idCard).get(0);
         SignUp signup = null;
-        for (SignUp sign : user.getSignUps()) {
+        List<SignUp> signUps = signUpRepository.findByUserId(user.getId());
+        for (SignUp sign : signUps) {
             if (StringUtils.startsWith(createTime, sdf.format(sign.getCreateTime()))) {
                 signup = sign;
             }

@@ -88,28 +88,13 @@ public class User {
     private UserExt userExt;
 
     @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Resume.class)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true, targetEntity = Resume.class)
     private List<Resume> resumes;
 
     @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Train.class)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true, targetEntity = Train.class)
     private List<Train> trains;
 
-    /**
-     * 用户报名信息
-     */
-    @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = SignUp.class)
-    private List<SignUp> signUps;
-
-
-    public List<SignUp> getSignUps() {
-        return signUps;
-    }
-
-    public void setSignUps(List<SignUp> signUps) {
-        this.signUps = signUps;
-    }
 
     public List<Resume> getResumes() {
         return resumes;
