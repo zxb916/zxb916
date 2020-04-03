@@ -8,6 +8,9 @@ import com.example.demo.model.User;
 import com.example.demo.service.ReviewService;
 import com.example.demo.service.SignUpService;
 import com.example.demo.service.UserService;
+import com.jacob.activeX.ActiveXComponent;
+import com.jacob.com.Dispatch;
+import com.jacob.com.Variant;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.FileUtils;
@@ -103,6 +106,7 @@ public class ReviewController extends BaseController {
         if (reportFile == null) {
             new BaseResult(Constants.RESPONSE_CODE_500, "生成报表失败");
         }
+
         response.setCharacterEncoding("utf-8");
         response.setContentType("multipart/form-data");
         // 设置浏览器以下载的方式处理该文件名
@@ -112,5 +116,36 @@ public class ReviewController extends BaseController {
         // 删除临时文件
 //        FileUtils.deleteQuietly(reportFile);
     }
+
+    private void open(String filePath, String type, boolean visible) {
+        try {
+            ActiveXComponent app = new ActiveXComponent(type);
+            app.setProperty("Visible", new Variant(visible));
+            Dispatch documents = app.getProperty("Documents").toDispatch();
+            Dispatch document = Dispatch.call(documents, "Open", filePath).toDispatch();
+            System.out.println("JacobUtil.class : 打开文档   " + filePath);
+            try {
+                Dispatch.call(document, "SaveAs", "C:\\Users\\huaruiview\\Desktop\\test.pdf", new Variant(17));
+            } catch (Exception e) {
+                System.err.println("JacobUtil.class : 文档转换为pdf失败！");
+                e.printStackTrace();
+            }
+            try {
+                Dispatch.call(document, "Close", false);
+                if (app != null) {
+                    app.invoke("Quit", new Variant[]{});
+                    app = null;
+                }
+                System.out.println("JacobUtil.class : 文档关闭  " + filePath);
+            } catch (Exception e) {
+                System.err.println("关闭ActiveXComponent异常");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.err.println("JacobUtil.class : 打开文档失败 " + filePath);
+            e.printStackTrace();
+        }
+    }
+
 
 }

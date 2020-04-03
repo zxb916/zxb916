@@ -42,6 +42,8 @@ public class ReviewServiceImpl implements ReviewService {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
 
+    private SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+
     private static final String PATH_DOC_TEMPLATE = "/";
 
     private Configuration ftlConfig = null;
@@ -262,12 +264,12 @@ public class ReviewServiceImpl implements ReviewService {
         resultMap.put("name", "solider");
         resultMap.put("applyWorkType", signup.getApplyWorkType());
         resultMap.put("userName", user.getUserName());
-        resultMap.put("createTime", sdf.format(signup.getCreateTime()));
+        resultMap.put("createTime", sdf1.format(signup.getCreateTime()));
         resultMap.put("userName", user.getUserName());
         resultMap.put("sex", user.getUserExt().getSex());
-        resultMap.put("profilePhoto", "<pkg:part pkg:name=\"/word/media/image1.png\" pkg:contentType=\"image/png\" pkg:compression=\"store\"><pkg:binaryData>" + ImgBase64.getImgStr("src/main/resources/1.jpg") + "</pkg:binaryData></pkg:part>");
+        resultMap.put("profilePhoto", ImgBase64.getImgStr("src/main/resources/2.png"));
         resultMap.put("idCard", user.getIdCard());
-        resultMap.put("birthday", StringUtils.isEmpty(sdf.format(user.getUserExt().getBirthday())) ? sdf.format(user.getUserExt().getBirthday()) : "");
+        resultMap.put("birthday", user.getUserExt().getBirthday() != null ? sdf1.format(user.getUserExt().getBirthday()) : "");
         resultMap.put("soldierId", user.getSoldierId());
         resultMap.put("degree", user.getUserExt().getDegree());
         resultMap.put("deptno", user.getDeptNo());
@@ -277,7 +279,7 @@ public class ReviewServiceImpl implements ReviewService {
         resultMap.put("alreadyWorkType", signup.getAlreadyWorkType());
         resultMap.put("alreadySkillRank", signup.getApplySkillRank());
         resultMap.put("alreadyCertificateNo", signup.getAlreadyCertificateNo());
-        resultMap.put("alreadyIssueDate", sdf.format(signup.getAlreadyIssueDate()));
+        resultMap.put("alreadyIssueDate", sdf1.format(signup.getAlreadyIssueDate()));
         resultMap.put("applyWorkType", signup.getApplyWorkType());
         resultMap.put("applySkillRank", signup.getApplySkillRank());
         if (signup.getChoice().equals("0")) {
@@ -295,8 +297,8 @@ public class ReviewServiceImpl implements ReviewService {
         }
         for (int i = 1; i <= 4; i++) {
             if (user.getResumes().size() >= i) {
-                resultMap.put("startTime" + i, sdf.format(user.getResumes().get(i - 1).getStartTime()));
-                resultMap.put("endTime" + i, sdf.format(user.getResumes().get(i - 1).getEndTime()));
+                resultMap.put("startTime" + i, sdf1.format(user.getResumes().get(i - 1).getStartTime()));
+                resultMap.put("endTime" + i, sdf1.format(user.getResumes().get(i - 1).getEndTime()));
                 resultMap.put("unit" + i, user.getResumes().get(i - 1).getUnit());
                 resultMap.put("majorName" + i, user.getResumes().get(i - 1).getMajorName());
             } else {
@@ -308,8 +310,8 @@ public class ReviewServiceImpl implements ReviewService {
         }
         for (int i = 1; i <= 4; i++) {
             if (user.getTrains().size() >= i) {
-                resultMap.put("startTime" + i, sdf.format(user.getTrains().get(i - 1).getStartTime()));
-                resultMap.put("endTime" + i, sdf.format(user.getTrains().get(i - 1).getEndTime()));
+                resultMap.put("startTime" + i, sdf1.format(user.getTrains().get(i - 1).getStartTime()));
+                resultMap.put("endTime" + i, sdf1.format(user.getTrains().get(i - 1).getEndTime()));
                 resultMap.put("unit" + i, user.getTrains().get(i - 1).getUnit());
                 resultMap.put("majorName" + i, user.getTrains().get(i - 1).getMajorName());
                 resultMap.put("count" + i, user.getTrains().get(i - 1).getCount() == null ? "" : user.getTrains().get(i - 1).getCount().toString());
@@ -331,8 +333,6 @@ public class ReviewServiceImpl implements ReviewService {
 
     @SuppressWarnings("deprecation")
     public File buildDoc(Map<String, String> reportMap, String templateName) {
-
-
         Template template = null;
         Writer writer = null;
         File docFile = null;
