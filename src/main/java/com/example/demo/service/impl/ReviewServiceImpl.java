@@ -80,23 +80,12 @@ public class ReviewServiceImpl implements ReviewService {
         String idCard = param.get("idCard").toString();
         String reviewOption = param.get("reviewOption").toString();
         String auditOpinion = param.get("auditOpinion").toString();
-        int businessCheck = Integer.parseInt(param.get("businessCheck").toString());
-        int soldiersCheck = Integer.parseInt(param.get("soldiersCheck").toString());
-        int check = Integer.parseInt(param.get("check").toString());
+        Integer check = Integer.parseInt(param.get("check").toString());
         if (StringUtils.isEmpty(idCard)) {
             return result.setAt1("身份证不能为空");
         }
         if (StringUtils.isEmpty(param.get("reviewOption").toString())) {
             return result.setAt1("审核意见不能为空");
-        }
-        if (StringUtils.isEmpty(param.get("auditOpinion").toString())) {
-            return result.setAt1("团级以上单位资格审查意见不能为空");
-        }
-        if (StringUtils.isEmpty(param.get("businessCheck").toString())) {
-            return result.setAt1("业务主管审核不能为空");
-        }
-        if (StringUtils.isEmpty(param.get("soldiersCheck").toString())) {
-            return result.setAt1("兵员和文职人员审核不能为空");
         }
         if (StringUtils.isEmpty(param.get("review").toString())) {
             return result.setAt1("审核不能为空");
@@ -105,8 +94,6 @@ public class ReviewServiceImpl implements ReviewService {
         SignUp signup = reviewRepository.findByUserId(user.getId());
         signup.setReviewOption(reviewOption);
         signup.setAuditOpinion(auditOpinion);
-        signup.setBusinessCheck(businessCheck);
-        signup.setSoldiersCheck(soldiersCheck);
         signup.setReview(check);
         reviewRepository.saveAndFlush(signup);
         return result.setAt0(false).setAt1("审核成功");
