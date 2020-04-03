@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -156,4 +157,17 @@ public class GlobalExceptionHandler {
         logger.error("操作数据库出现异常:", e);
         return new BaseResult(Constants.RESPONSE_CODE_500, Constants.RESPONSE_MESSAGE_500, "操作数据库出现异常");
     }
+
+
+    /**
+     * 操作数据库出现异常:名称重复，外键关联
+     */
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(TransactionSystemException.class)
+    public BaseResult handleException(TransactionSystemException e) {
+        logger.error("validate验证失败", e);
+        return new BaseResult(Constants.RESPONSE_CODE_400, Constants.RESPONSE_MESSAGE_400, "参数格式和非空校验失败");
+    }
+
+
 }

@@ -98,10 +98,10 @@ public class ReviewController extends BaseController {
 
     @ApiOperation(value = "生成报名表")
     @GetMapping(PATH_CREATE_REPORT)
-    public BaseResult createReport(@RequestParam("idCard") String idCard, @RequestParam("year") String year, HttpServletResponse response) throws IOException {
+    public void createReport(@RequestParam("idCard") String idCard, @RequestParam("year") String year, HttpServletResponse response) throws IOException {
         File reportFile = reviewService.build(idCard, year);
         if (reportFile == null) {
-            return new BaseResult(Constants.RESPONSE_CODE_500, "生成报表失败");
+            new BaseResult(Constants.RESPONSE_CODE_500, "生成报表失败");
         }
         response.setCharacterEncoding("utf-8");
         response.setContentType("multipart/form-data");
@@ -111,7 +111,6 @@ public class ReviewController extends BaseController {
         // IOUtils.copyLarge(new FileInputStream(reportFile), response.getOutputStream());
         // 删除临时文件
 //        FileUtils.deleteQuietly(reportFile);
-        return new BaseResult(Constants.RESPONSE_CODE_200, "生成报表成功");
     }
 
 }

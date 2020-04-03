@@ -35,14 +35,14 @@ public class User {
      * 身份证
      */
     @NotEmpty(message = "身份证号不允许为空")
-    @Pattern(regexp = "/^[1-9]\\d{5}(18|19|20|(3\\d))\\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$/")
+    @Pattern(regexp = "^[1-9]\\d{5}(18|19|([23]\\d))\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$")
     @Column(name = "id_card")
     private String idCard;
 
     /**
      * 士兵证
      */
-    @NotEmpty(message = "士兵类型")
+    @NotEmpty(message = "士兵类型不允许为空")
     @Column(name = "soldier_type")
     private String soldierType;
 

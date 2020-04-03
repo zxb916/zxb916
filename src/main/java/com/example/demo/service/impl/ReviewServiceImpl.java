@@ -7,6 +7,7 @@ import com.example.demo.repository.ReviewRepository;
 import com.example.demo.repository.SignUpRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.ReviewService;
+import com.example.demo.util.ImgBase64;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -257,14 +258,14 @@ public class ReviewServiceImpl implements ReviewService {
                 signup = sign;
             }
         }
-        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, String> resultMap = new HashMap<>();
         resultMap.put("name", "solider");
         resultMap.put("applyWorkType", signup.getApplyWorkType());
         resultMap.put("userName", user.getUserName());
         resultMap.put("createTime", sdf.format(signup.getCreateTime()));
         resultMap.put("userName", user.getUserName());
         resultMap.put("sex", user.getUserExt().getSex());
-        resultMap.put("profilePhoto", user.getUserExt().getProfilePhoto());
+        resultMap.put("profilePhoto", "<pkg:part pkg:name=\"/word/media/image1.png\" pkg:contentType=\"image/png\" pkg:compression=\"store\"><pkg:binaryData>" + ImgBase64.getImgStr("src/main/resources/1.jpg") + "</pkg:binaryData></pkg:part>");
         resultMap.put("idCard", user.getIdCard());
         resultMap.put("birthday", StringUtils.isEmpty(sdf.format(user.getUserExt().getBirthday())) ? sdf.format(user.getUserExt().getBirthday()) : "");
         resultMap.put("soldierId", user.getSoldierId());
@@ -279,6 +280,19 @@ public class ReviewServiceImpl implements ReviewService {
         resultMap.put("alreadyIssueDate", sdf.format(signup.getAlreadyIssueDate()));
         resultMap.put("applyWorkType", signup.getApplyWorkType());
         resultMap.put("applySkillRank", signup.getApplySkillRank());
+        if (signup.getChoice().equals("0")) {
+            resultMap.put("choice", "理论知识√   操作技能□   综合评审□");
+        } else if (signup.getChoice().equals("0,1")) {
+            resultMap.put("choice", "理论知识√   操作技能√   综合评审□");
+        } else if (signup.getChoice().equals("0,1,2")) {
+            resultMap.put("choice", "理论知识√   操作技能√   综合评审√");
+        } else if (signup.getChoice().equals("1,2")) {
+            resultMap.put("choice", "理论知识□   操作技能√   综合评审√");
+        } else if (signup.getChoice().equals("1")) {
+            resultMap.put("choice", "理论知识□   操作技能√   综合评审□");
+        } else if (signup.getChoice().equals("2")) {
+            resultMap.put("choice", "理论知识□   操作技能□   综合评审√");
+        }
         for (int i = 1; i <= 4; i++) {
             if (user.getResumes().size() >= i) {
                 resultMap.put("startTime" + i, sdf.format(user.getResumes().get(i - 1).getStartTime()));
@@ -298,7 +312,7 @@ public class ReviewServiceImpl implements ReviewService {
                 resultMap.put("endTime" + i, sdf.format(user.getTrains().get(i - 1).getEndTime()));
                 resultMap.put("unit" + i, user.getTrains().get(i - 1).getUnit());
                 resultMap.put("majorName" + i, user.getTrains().get(i - 1).getMajorName());
-                resultMap.put("count" + i, user.getTrains().get(i - 1).getCount());
+                resultMap.put("count" + i, user.getTrains().get(i - 1).getCount() == null ? "" : user.getTrains().get(i - 1).getCount().toString());
             } else {
                 resultMap.put("startTime" + i, "");
                 resultMap.put("endTime" + i, "");
@@ -316,7 +330,9 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @SuppressWarnings("deprecation")
-    public File buildDoc(Map<String, Object> reportMap, String templateName) {
+    public File buildDoc(Map<String, String> reportMap, String templateName) {
+
+
         Template template = null;
         Writer writer = null;
         File docFile = null;

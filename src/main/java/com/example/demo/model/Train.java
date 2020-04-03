@@ -38,7 +38,7 @@ public class Train {
      * 标准学时数
      */
     @Column(name = "count")
-    private int count;
+    private Integer count;
 
 
     @JsonBackReference
@@ -100,13 +100,11 @@ public class Train {
     }
 
 
-    public int getCount() {
+    public Integer getCount() {
         return count;
     }
 
-    public void setCount(int count) {
+    public void setCount(Integer count) {
         this.count = count;
     }
-
-
 }

@@ -95,13 +95,14 @@
         </dependency>
         <!--freemarker模板依赖-->
         <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
         </dependency>
+        <!-- FlyingSaucer 依赖   https://mvnrepository.com/artifact/org.xhtmlrenderer/flying-saucer-pdf -->
         <dependency>
             <groupId>org.xhtmlrenderer</groupId>
             <artifactId>flying-saucer-pdf</artifactId>
-            <version>9.0.9</version>
+            <version>9.1.12</version>
         </dependency>
 
         <dependency>
