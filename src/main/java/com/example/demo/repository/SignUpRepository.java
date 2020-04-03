@@ -12,7 +12,7 @@ import java.util.List;
 public interface SignUpRepository extends CrudRepository<SignUp, Long> {
     //根据工种获取报名信息
     @Query(value = "select * from sign_up where apply_work_type = :applyWorkType and create_time like :year%", nativeQuery = true)
-    List<SignUp> getSignUpList(@Param("year") String applyWorkType, @Param("year") String year);
+    List<SignUp> getSignUpList(@Param("applyWorkType") String applyWorkType, @Param("year") String year);
 
     @Query(value = "select * from sign_up where user_id = :id and create_time like :year%", nativeQuery = true)
     List<SignUp> getList(Long id, String year);

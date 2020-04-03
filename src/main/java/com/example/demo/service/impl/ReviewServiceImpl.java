@@ -51,8 +51,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<JSONObject> getList(String alreadyWorkType, String createTime) {
-        List<SignUp> signupList = reviewRepository.getList(alreadyWorkType, createTime);
+    public List<JSONObject> getList(String applyWorkType, String year) {
+        List<SignUp> signupList = reviewRepository.getList(applyWorkType, year);
         List<JSONObject> result = new ArrayList<>();
         for (SignUp signup : signupList) {
             Optional<User> opt = userRepository.findById(signup.getUser().getId());
@@ -248,12 +248,12 @@ public class ReviewServiceImpl implements ReviewService {
 
 
     @Override
-    public File build(String idCard, String createTime) {
+    public File build(String idCard, String year) {
         User user = userRepository.findByIdCardLike(idCard).get(0);
         SignUp signup = null;
         List<SignUp> signUps = signUpRepository.findByUserId(user.getId());
         for (SignUp sign : signUps) {
-            if (StringUtils.startsWith(createTime, sdf.format(sign.getCreateTime()))) {
+            if (StringUtils.startsWith(sdf.format(sign.getCreateTime()), year)) {
                 signup = sign;
             }
         }
@@ -266,7 +266,7 @@ public class ReviewServiceImpl implements ReviewService {
         resultMap.put("sex", user.getUserExt().getSex());
         resultMap.put("profilePhoto", user.getUserExt().getProfilePhoto());
         resultMap.put("idCard", user.getIdCard());
-        resultMap.put("birthday", sdf.format(user.getUserExt().getBirthday()));
+        resultMap.put("birthday", StringUtils.isEmpty(sdf.format(user.getUserExt().getBirthday())) ? sdf.format(user.getUserExt().getBirthday()) : "");
         resultMap.put("soldierId", user.getSoldierId());
         resultMap.put("degree", user.getUserExt().getDegree());
         resultMap.put("deptno", user.getDeptNo());

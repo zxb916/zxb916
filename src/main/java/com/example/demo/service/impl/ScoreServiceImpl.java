@@ -116,11 +116,11 @@ public class ScoreServiceImpl implements ScoreService {
     }
 
     @Override
-    public void export(HttpServletResponse response, String applyWorkType, String createTime) throws Exception {
+    public void export(HttpServletResponse response, String applyWorkType, String year) throws Exception {
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("学生成绩表");
         createTitle(workbook, sheet);
-        List<Object> userScoreList = getUserScoreList(applyWorkType, createTime);
+        List<Object> userScoreList = getUserScoreList(applyWorkType, year);
         HSSFRow row = sheet.createRow(userScoreList.size() + 1);
         int count = 1;
         for (Object object : userScoreList) {

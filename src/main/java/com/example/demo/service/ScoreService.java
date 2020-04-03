@@ -16,7 +16,7 @@ public interface ScoreService {
 
     void insert(String idCard, Long theoryScore, Long operationScore, Long overallScore, String finalResult, String creatTime);
 
-    void export(HttpServletResponse response, String alreadyWorkType, String createTime) throws Exception;
+    void export(HttpServletResponse response, String applyWorkType, String year) throws Exception;
 
     void upload(Long id, File file) throws FileNotFoundException;
 }

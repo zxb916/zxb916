@@ -12,12 +12,12 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<SignUp, Long> {
 
 
-    @Query(value = "select * from SignUp where apply_work_type =:alreadyWorkType and create_time like :createTime%", nativeQuery = true)
-    List<SignUp> getList(@Param("alreadyWorkType") String alreadyWorkType, @Param("createTime") String createTime);
+    @Query(value = "select * from SignUp where apply_work_type =:applyWorkType and create_time like :year%", nativeQuery = true)
+    List<SignUp> getList(@Param("applyWorkType") String applyWorkType, @Param("year") String year);
 
     @Query(value = "select * from SignUp where user_id = :userId", nativeQuery = true)
     SignUp findByUserId(@Param("userId") Long id);
 
-    @Query(value = "select * from SignUp where apply_work_type =:alreadyWorkType and create_time like ':createTime%' and check = 1", nativeQuery = true)
-    List<SignUp> getReviewList(@Param("alreadyWorkType") String alreadyWorkType, @Param("createTime") String createTime);
+    @Query(value = "select * from SignUp where apply_work_type =:applyWorkType and create_time like ':year%' and check = 1", nativeQuery = true)
+    List<SignUp> getReviewList(@Param("applyWorkType") String applyWorkType, @Param("year") String year);
 }

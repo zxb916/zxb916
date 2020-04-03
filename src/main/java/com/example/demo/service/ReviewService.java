@@ -12,13 +12,14 @@ import java.util.List;
 public interface ReviewService {
     /**
      * 根据工种和年份获取信息
-     * @param alreadyWorkType
-     * @param createTime
+     *
+     * @param applyWorkType
+     * @param year
      * @return
      */
-    List<JSONObject> getList(String alreadyWorkType, String createTime);
+    List<JSONObject> getList(String applyWorkType, String year);
 
-    Pair<Boolean,String> checkAndSave(String requestParam);
+    Pair<Boolean, String> checkAndSave(String requestParam);
 
     /**
      * 生成报表
@@ -31,7 +32,7 @@ public interface ReviewService {
      * @param idCard
      * @return
      */
-    File build(String idCard, String createTime);
+    File build(String idCard, String year);
 
 
     void saveAndFlush(SignUp signUp);
