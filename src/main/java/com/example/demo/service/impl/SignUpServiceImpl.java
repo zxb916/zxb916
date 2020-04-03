@@ -6,6 +6,8 @@ import com.example.demo.service.SignUpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class SignUpServiceImpl implements SignUpService {
@@ -16,5 +18,10 @@ public class SignUpServiceImpl implements SignUpService {
     @Override
     public SignUp save(SignUp signUp) {
         return signUpRepository.save(signUp);
+    }
+
+    @Override
+    public List<SignUp> findByUserId(Long user_id) {
+        return signUpRepository.findByUserId(user_id);
     }
 }

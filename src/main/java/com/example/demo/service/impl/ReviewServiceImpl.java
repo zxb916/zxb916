@@ -310,6 +310,11 @@ public class ReviewServiceImpl implements ReviewService {
         return buildDoc(resultMap, "solider.ftl");
     }
 
+    @Override
+    public void saveAndFlush(SignUp signUp) {
+        reviewRepository.saveAndFlush(signUp);
+    }
+
     @SuppressWarnings("deprecation")
     public File buildDoc(Map<String, Object> reportMap, String templateName) {
         Template template = null;

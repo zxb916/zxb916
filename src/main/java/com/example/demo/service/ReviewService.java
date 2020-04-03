@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.demo.model.SignUp;
 import org.javatuples.Pair;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,4 +32,7 @@ public interface ReviewService {
      * @return
      */
     File build(String idCard, String createTime);
+
+
+    void saveAndFlush(SignUp signUp);
 }

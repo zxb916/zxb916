@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -26,36 +28,44 @@ public class User {
     /**
      * 用户名
      */
+    @NotEmpty(message="用户名不允许为空")
     @Column(name = "user_name")
     private String userName;
     /**
      * 身份证
      */
+    @NotEmpty(message="身份证号不允许为空")
+    @Pattern(regexp = "/^[1-9]\\d{5}(18|19|20|(3\\d))\\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$/")
     @Column(name = "id_card")
     private String idCard;
     /**
      * 士兵证
      */
+    @NotEmpty(message="士兵证号不允许为空")
     @Column(name = "soldier_id")
     private String soldierId;
     /**
      * 军衔
      */
+    @NotEmpty(message="军衔不允许为空")
     @Column(name = "armed_rank")
     private String armedRank;
     /**
      * 联系电话
      */
+    @NotEmpty(message="联系电话不允许为空")
     @Column(name = "mobile")
     private String mobile;
     /**
      * 部号
      */
+    @NotEmpty(message="部别不允许为空")
     @Column(name = "dept_no")
     private String deptNo;
     /**
      * 通信地址
      */
+    @NotEmpty(message="通信地址不允许为空")
     @Column(name = "mailing_address")
     private String mailingAddress;
     /**
