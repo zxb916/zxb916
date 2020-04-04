@@ -24,4 +24,9 @@ public class SignUpServiceImpl implements SignUpService {
     public List<SignUp> findByUserId(Long user_id) {
         return signUpRepository.findByUserId(user_id);
     }
+
+    @Override
+    public SignUp findByUserIdAndYear(Long user_id, String year) {
+        return signUpRepository.findByUserIdAndYear(user_id, year);
+    }
 }

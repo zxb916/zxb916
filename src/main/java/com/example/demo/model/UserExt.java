@@ -48,7 +48,7 @@ public class UserExt {
     private Integer workTime;
 
     @JsonBackReference
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = User.class)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = User.class)
     private User user;
 
 

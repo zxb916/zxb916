@@ -22,4 +22,7 @@ public interface SignUpRepository extends CrudRepository<SignUp, Long> {
 
     @Query(value = "select * from sign_up where user_id = :user_id", nativeQuery = true)
     List<SignUp> findByUserId(Long user_id);
+
+    @Query(value = "select * from sign_up where user_id = :user_id  and create_time like :year%", nativeQuery = true)
+    SignUp findByUserIdAndYear(Long user_id, String year);
 }

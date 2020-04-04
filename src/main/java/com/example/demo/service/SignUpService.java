@@ -23,5 +23,13 @@ public interface SignUpService {
      */
     List<SignUp> findByUserId(Long user_id);
 
+    /**
+     * 获取报名信息
+     *
+     * @param user_id
+     * @param year
+     * @return
+     */
+    SignUp findByUserIdAndYear(Long user_id, String year);
 
 }

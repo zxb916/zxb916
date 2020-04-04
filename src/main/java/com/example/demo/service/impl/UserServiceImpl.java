@@ -4,6 +4,9 @@ import com.example.demo.bo.AdminUserDetails;
 import com.example.demo.component.JwtTokenUtil;
 import com.example.demo.model.RoleType;
 import com.example.demo.model.User;
+import com.example.demo.repository.ResumeRepository;
+import com.example.demo.repository.TrainRepository;
+import com.example.demo.repository.UserExtRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
 import org.slf4j.Logger;
@@ -21,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -32,6 +36,7 @@ import java.util.Optional;
  * Created by macro on 2018/4/26.
  */
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
@@ -47,6 +52,14 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository adminMapper;
 
+    @Autowired
+    private UserExtRepository userExtRepository;
+
+    @Autowired
+    private TrainRepository trainRepository;
+
+    @Autowired
+    private ResumeRepository resumeRepository;
 
     @Override
     public AdminUserDetails getAdminByUsername(String username) {
@@ -113,6 +126,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void update(User user) {
+//        userExtRepository.deleteByUserId(user.getId());
+//        resumeRepository.deleteByUserId(user.getId());
+//        trainRepository.deleteByUserId(user.getId());
+        adminMapper.save(user);
+    }
+
+    @Override
+    public void save(User user) {
         adminMapper.save(user);
     }
 

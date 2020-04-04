@@ -1,7 +1,9 @@
 package com.example.demo.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.demo.model.Resume;
 import com.example.demo.model.SignUp;
+import com.example.demo.model.Train;
 import com.example.demo.model.User;
 import com.example.demo.repository.ReviewRepository;
 import com.example.demo.repository.SignUpRepository;
@@ -282,33 +284,35 @@ public class ReviewServiceImpl implements ReviewService {
         } else if (signup.getChoice().equals("2")) {
             resultMap.put("choice", "理论知识□   操作技能□   综合评审√");
         }
-        for (int i = 1; i <= 4; i++) {
-            if (user.getResumes().size() >= i) {
-                resultMap.put("startTime" + i, sdf1.format(user.getResumes().get(i - 1).getStartTime()));
-                resultMap.put("endTime" + i, sdf1.format(user.getResumes().get(i - 1).getEndTime()));
-                resultMap.put("unit" + i, user.getResumes().get(i - 1).getUnit());
-                resultMap.put("majorName" + i, user.getResumes().get(i - 1).getMajorName());
-            } else {
-                resultMap.put("startTime" + i, "");
-                resultMap.put("endTime" + i, "");
-                resultMap.put("unit" + i, "");
-                resultMap.put("majorName" + i, "");
-            }
+        int index = 1;
+        for (Resume resume : user.getResumes()) {
+            resultMap.put("startTime" + index, sdf1.format(resume.getStartTime()));
+            resultMap.put("endTime" + index, sdf1.format(resume.getEndTime()));
+            resultMap.put("unit" + index, resume.getUnit());
+            resultMap.put("majorName" + index, resume.getMajorName());
+            index++;
         }
-        for (int i = 1; i <= 4; i++) {
-            if (user.getTrains().size() >= i) {
-                resultMap.put("startTime" + i, sdf1.format(user.getTrains().get(i - 1).getStartTime()));
-                resultMap.put("endTime" + i, sdf1.format(user.getTrains().get(i - 1).getEndTime()));
-                resultMap.put("unit" + i, user.getTrains().get(i - 1).getUnit());
-                resultMap.put("majorName" + i, user.getTrains().get(i - 1).getMajorName());
-                resultMap.put("count" + i, user.getTrains().get(i - 1).getCount() == null ? "" : user.getTrains().get(i - 1).getCount().toString());
-            } else {
-                resultMap.put("startTime" + i, "");
-                resultMap.put("endTime" + i, "");
-                resultMap.put("unit" + i, "");
-                resultMap.put("majorName" + i, "");
-                resultMap.put("count" + i, "");
-            }
+        for (int i = user.getResumes().size() + 1; i <= 4; i++) {
+            resultMap.put("startTime" + i, "");
+            resultMap.put("endTime" + i, "");
+            resultMap.put("unit" + i, "");
+            resultMap.put("majorName" + i, "");
+        }
+        index = 1;
+        for (Train train : user.getTrains()) {
+            resultMap.put("startTime" + index, sdf1.format(train.getStartTime()));
+            resultMap.put("endTime" + index, sdf1.format(train.getEndTime()));
+            resultMap.put("unit" + index, train.getUnit());
+            resultMap.put("majorName" + index, train.getMajorName());
+            resultMap.put("count" + index, train.getCount() == null ? "" : train.getCount().toString());
+            index++;
+        }
+        for (int i = user.getTrains().size() + 1; i <= 4; i++) {
+            resultMap.put("startTime" + i, "");
+            resultMap.put("endTime" + i, "");
+            resultMap.put("unit" + i, "");
+            resultMap.put("majorName" + i, "");
+            resultMap.put("count" + i, "");
         }
         return buildDoc(resultMap, "solider.ftl");
     }

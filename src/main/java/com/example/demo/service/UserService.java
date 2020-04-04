@@ -57,6 +57,12 @@ public interface UserService {
      */
     void update(User user);
 
+    /**
+     * 新增用户
+     *
+     * @param user
+     */
+    void save(User user);
 
     /**
      * 分页查询用户信息
@@ -70,6 +76,7 @@ public interface UserService {
 
     /**
      * 删除用户
+     *
      * @param user
      */
     void delete(User user);

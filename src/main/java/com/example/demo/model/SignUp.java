@@ -1,8 +1,8 @@
 package com.example.demo.model;
 
+import com.example.demo.util.DateFormatUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -86,9 +86,9 @@ public class SignUp {
     /**
      * 创建时间
      */
-    @CreationTimestamp
     @Column(name = "create_time")
-    private Date createTime;
+    private String createTime = DateFormatUtils.getDateTime();
+    ;
     /**
      * 团级以上单位资格审查意见
      */
@@ -230,14 +230,9 @@ public class SignUp {
     }
 
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
 
     public String getAuditOpinion() {
         return auditOpinion;

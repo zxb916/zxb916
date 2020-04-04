@@ -9,7 +9,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "user")
@@ -55,7 +55,6 @@ public class User {
     /**
      * 军衔
      */
-    @NotEmpty(message = "军衔不允许为空")
     @Column(name = "armed_rank")
     private String armedRank;
     /**
@@ -102,31 +101,31 @@ public class User {
      * 用户元信息
      */
     @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = UserExt.class)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = UserExt.class)
     private UserExt userExt;
 
     @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true, targetEntity = Resume.class)
-    private List<Resume> resumes;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, targetEntity = Resume.class)
+    private Set<Resume> resumes;
 
     @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true, targetEntity = Train.class)
-    private List<Train> trains;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, targetEntity = Train.class)
+    private Set<Train> trains;
 
 
-    public List<Resume> getResumes() {
+    public Set<Resume> getResumes() {
         return resumes;
     }
 
-    public void setResumes(List<Resume> resumes) {
+    public void setResumes(Set<Resume> resumes) {
         this.resumes = resumes;
     }
 
-    public List<Train> getTrains() {
+    public Set<Train> getTrains() {
         return trains;
     }
 
-    public void setTrains(List<Train> trains) {
+    public void setTrains(Set<Train> trains) {
         this.trains = trains;
     }
 

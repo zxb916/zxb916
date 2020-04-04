@@ -7,7 +7,9 @@ import com.example.demo.common.BaseController;
 import com.example.demo.common.BaseResult;
 import com.example.demo.common.Constants;
 import com.example.demo.component.JwtTokenUtil;
+import com.example.demo.model.SignUp;
 import com.example.demo.model.User;
+import com.example.demo.service.SignUpService;
 import com.example.demo.service.UserService;
 import com.example.demo.util.BeanCopy;
 import com.example.demo.util.PageUtil;
@@ -53,11 +55,14 @@ public class UserController extends BaseController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private SignUpService signUpService;
 
     @ApiOperation(value = "用户注册")
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseBody
     public Object register(@RequestBody User user) {
+        logger.info("注册" + user);
         userService.register(user);
         return ResponseEntity.ok(new BaseResult(Constants.RESPONSE_CODE_200, "注册成功"));
     }
@@ -119,7 +124,7 @@ public class UserController extends BaseController {
             user.setOldPassword(newPassword);
             String hashed = BCrypt.hashpw(newPassword, BCrypt.gensalt(12));
             user.setPassword(hashed);
-            userService.update(user);
+            userService.save(user);
         } catch (Exception e) {
             return new BaseResult(Constants.RESPONSE_CODE_500, "数据库异常");
         }
@@ -140,7 +145,7 @@ public class UserController extends BaseController {
         User user = adminUserDetails.getUser();
         String hashed = BCrypt.hashpw("123456", BCrypt.gensalt(12));
         user.setPassword(hashed);
-        userService.update(user);
+        userService.save(user);
         return new BaseResult(Constants.RESPONSE_CODE_200, "重置密码成功");
     }
 
@@ -178,40 +183,47 @@ public class UserController extends BaseController {
         return new BaseResult(Constants.RESPONSE_CODE_200, "ok", user);
     }
 
-
     @ApiOperation(value = "查询学员基本信息")
     @GetMapping(value = "/getOne")
-    public BaseResult getOne(@RequestParam("idCard") String idCard) {
-        logger.info("查询学员基本信息" + idCard);
+    public BaseResult getOne(@RequestParam(value = "idCard", required = false) String idCard, @RequestParam(value = "year") String year, HttpServletRequest request) {
+        logger.info("查询学员基本信息 idCard=" + idCard + "  year=" + year);
         User user = null;
+        Map<String, Object> map = new HashMap<>();
         try {
-            AdminUserDetails adminUserDetails = userService.getAdminByUserNameOrIdCard(idCard);
-            if (adminUserDetails == null) {
-                return new BaseResult(Constants.RESPONSE_CODE_404, "用户不存在");
+            if (!StringUtils.isEmpty(idCard)) {
+                AdminUserDetails adminUserDetails = userService.getAdminByIdCard(idCard);
+                if (adminUserDetails == null) {
+                    return new BaseResult(Constants.RESPONSE_CODE_404, "用户不存在");
+                }
+                user = adminUserDetails.getUser();
+            } else {
+                logger.info(request.getHeader(tokenHeader));
+                AdminUserDetails adminUserDetails = jwtTokenUtil.getAdminByToken(request.getHeader(tokenHeader).substring(this.tokenHead.length()));
+                user = adminUserDetails.getUser();
             }
-            user = adminUserDetails.getUser();
+            SignUp signUp = signUpService.findByUserIdAndYear(user.getId(), year);
+            map.put("user", user);
+            map.put("signUp", signUp);
         } catch (Exception e) {
             e.printStackTrace();
+            return new BaseResult(Constants.RESPONSE_CODE_500, "服务器异常");
         }
-        return new BaseResult(Constants.RESPONSE_CODE_200, "ok", user);
+        return new BaseResult(Constants.RESPONSE_CODE_200, "ok", map);
     }
 
 
-    @ApiOperation(value = "修改学员基本信息")
+    @ApiOperation(value = "学员基本信息修改")
     @PostMapping(value = "/edit")
-    public BaseResult edit(@RequestBody User user) {
-        logger.info("查询学员基本信息" + user);
+    public BaseResult edit(@RequestBody User user, HttpServletRequest request) {
+        logger.info("学员基本信息修改" + user);
+        AdminUserDetails adminUserDetails = jwtTokenUtil.getAdminByToken(request.getHeader(tokenHeader).substring(this.tokenHead.length()));
         try {
-            User user1 = userService.getItem(user.getId()).get();
-            if (user1 == null) {
-                return new BaseResult(Constants.RESPONSE_CODE_404, "用户不存在");
-            }
-            BeanUtils.copyProperties(user, user1, BeanCopy.getNullPropertyNames(user));
-            userService.update(user1);
+            BeanUtils.copyProperties(user, adminUserDetails.getUser(), BeanCopy.getNullPropertyNames(user));
+            userService.save(adminUserDetails.getUser());
         } catch (Exception e) {
-            e.printStackTrace();
+            return new BaseResult(Constants.RESPONSE_CODE_500, "数据库异常");
         }
-        return new BaseResult(Constants.RESPONSE_CODE_200, "ok");
+        return new BaseResult(Constants.RESPONSE_CODE_200, "修改信息成功");
     }
 
 
