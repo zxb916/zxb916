@@ -73,7 +73,12 @@ public class ScoreServiceImpl implements ScoreService {
     @Override
     public List<Object> getUserScoreList(String applyWorkType, String year) {
         ArrayList<Object> result = new ArrayList<>();
-        List<SignUp> signUpList = signUpRepository.getSignUpList(applyWorkType, year);
+        List<SignUp> signUpList = null;
+        if (applyWorkType.equals("全部")) {
+            signUpList = signUpRepository.getListAll(year);
+        } else {
+            signUpList = signUpRepository.getSignUpList(applyWorkType, year);
+        }
         for (SignUp signUp : signUpList) {
             JSONObject object = new JSONObject();
             Score score = signUp.getScore();
@@ -84,8 +89,8 @@ public class ScoreServiceImpl implements ScoreService {
             object.put("userName", user.getUserName());
             object.put("idCard", user.getIdCard());
             object.put("soldierId", user.getSoldierId());
-            object.put("alreadyWorkType", signUp.getAlreadyWorkType());
-            object.put("alreadySkillRank", signUp.getAlreadySkillRank());
+            object.put("applyWorkType", signUp.getApplyWorkType());
+            object.put("applySkillRank", signUp.getApplySkillRank());
             object.put("Deptno", user.getDeptNo());
             object.put("armedRank", user.getArmedRank());
             object.put("passCard", signUp.getPassCard());
