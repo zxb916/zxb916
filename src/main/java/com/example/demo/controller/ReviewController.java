@@ -9,7 +9,7 @@ import com.example.demo.service.ReviewService;
 import com.example.demo.service.SignUpService;
 import com.example.demo.service.UserService;
 import com.jacob.activeX.ActiveXComponent;
-import com.jacob.com.Dispatch;
+import com.jacob.com.ComThread;
 import com.jacob.com.Variant;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -48,14 +48,16 @@ public class ReviewController extends BaseController {
     private ReviewService reviewService;
 
     @Autowired
-    private UserService userService;
+    private SignUpService signUpService;
 
     @Autowired
-    private SignUpService signUpService;
+    private UserService userService;
+
 
     @ApiOperation(value = "获取列表")
     @GetMapping(PATH_LIST)
-    public BaseResult list(String applyWorkType, String year) {
+    public BaseResult list(@RequestParam(value = "applyWorkType", required = true) String applyWorkType, @RequestParam(value = "year", required = true) String year) {
+        logger.info("获取报名列表");
         if (StringUtils.isEmpty(applyWorkType) || StringUtils.isEmpty(year)) {
             return new BaseResult(Constants.RESPONSE_CODE_500, "申请工种和创建时间不能为空");
         }
@@ -88,12 +90,15 @@ public class ReviewController extends BaseController {
     @ApiOperation(value = "添加准考证号")
     @PostMapping(PATH_EDIT)
     public BaseResult edit(String idCard, String passCard, String year) {
-        User user = userService.getAdminByIdCard(idCard).getUser();
-        for (SignUp signUp : signUpService.findByUserId(user.getId())) {
-            if (StringUtils.startsWith(sdf.format(signUp.getCreateTime()), year)) {
-                signUp.setPassCard(passCard);
-                reviewService.saveAndFlush(signUp);
-            }
+        logger.info("添加准考证号");
+        try {
+            User user = userService.getAdminByIdCard(idCard).getUser();
+            SignUp signUp = signUpService.findByUserIdAndYear(user.getId(), year);
+            signUp.setPassCard(passCard);
+            signUpService.save(signUp);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new BaseResult(Constants.RESPONSE_CODE_500, "逻辑异常!");
         }
         return new BaseResult(Constants.RESPONSE_CODE_200, "审核成功!");
     }
@@ -106,45 +111,51 @@ public class ReviewController extends BaseController {
         if (reportFile == null) {
             new BaseResult(Constants.RESPONSE_CODE_500, "生成报表失败");
         }
+        try {
+//            wpsTopdf("C:\\Users\\huaruiview\\Desktop\\'士兵表明表.doc'", "C:\\Users\\huaruiview\\Desktop\\'test.doc'");
+            logger.info("转换完成！");
+            response.setCharacterEncoding("utf-8");
+            response.setContentType("multipart/form-data");
+            // 设置浏览器以下载的方式处理该文件名
+            response.setHeader("Content-Disposition", "attachment;filename=".concat(URLEncoder.encode("士兵报名表".concat(".doc"), "UTF-8")));
+            IOUtils.write(FileUtils.readFileToByteArray(reportFile), response.getOutputStream());
 
-        response.setCharacterEncoding("utf-8");
-        response.setContentType("multipart/form-data");
-        // 设置浏览器以下载的方式处理该文件名
-        response.setHeader("Content-Disposition", "attachment;filename=".concat(URLEncoder.encode("士兵报名表".concat(".doc"), "UTF-8")));
-        IOUtils.write(FileUtils.readFileToByteArray(reportFile), response.getOutputStream());
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setContentType("application/json");
+            response.getOutputStream().print("格式转化异常");
+        }
+
         // IOUtils.copyLarge(new FileInputStream(reportFile), response.getOutputStream());
         // 删除临时文件
 //        FileUtils.deleteQuietly(reportFile);
     }
 
-    private void open(String filePath, String type, boolean visible) {
+    public boolean wpsTopdf(String srcFilePath, String pdfFilePath) throws Exception {
+        // wps com
+        ActiveXComponent pptActiveXComponent = null;
+        ActiveXComponent workbook = null;
+        // open thred
+        ComThread.InitSTA();
         try {
-            ActiveXComponent app = new ActiveXComponent(type);
-            app.setProperty("Visible", new Variant(visible));
-            Dispatch documents = app.getProperty("Documents").toDispatch();
-            Dispatch document = Dispatch.call(documents, "Open", filePath).toDispatch();
-            System.out.println("JacobUtil.class : 打开文档   " + filePath);
-            try {
-                Dispatch.call(document, "SaveAs", "C:\\Users\\huaruiview\\Desktop\\test.pdf", new Variant(17));
-            } catch (Exception e) {
-                System.err.println("JacobUtil.class : 文档转换为pdf失败！");
-                e.printStackTrace();
-            }
-            try {
-                Dispatch.call(document, "Close", false);
-                if (app != null) {
-                    app.invoke("Quit", new Variant[]{});
-                    app = null;
-                }
-                System.out.println("JacobUtil.class : 文档关闭  " + filePath);
-            } catch (Exception e) {
-                System.err.println("关闭ActiveXComponent异常");
-                e.printStackTrace();
-            }
+            pptActiveXComponent = new ActiveXComponent("KWPP.Application");
+            Variant openParams[] = {new Variant(srcFilePath), new Variant(true), new Variant(true)};
+            workbook = pptActiveXComponent.invokeGetComponent("Documents").invokeGetComponent("Open", openParams);
+            workbook.invoke("SaveAs", new Variant[]{new Variant(pdfFilePath), new Variant(17)});
         } catch (Exception e) {
-            System.err.println("JacobUtil.class : 打开文档失败 " + filePath);
-            e.printStackTrace();
+            throw e;
+        } finally {
+            if (workbook != null) {
+                workbook.invoke("Close");
+                workbook.safeRelease();
+            }
+            if (pptActiveXComponent != null) {
+                pptActiveXComponent.invoke("Quit");
+                pptActiveXComponent.safeRelease();
+            }
+            ComThread.Release();
         }
+        return true;
     }
 
 

@@ -57,7 +57,12 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public List<JSONObject> getList(String applyWorkType, String year) {
-        List<SignUp> signupList = reviewRepository.getList(applyWorkType, year);
+        List<SignUp> signupList = null;
+        if (applyWorkType.equals("全部")) {
+            signupList = reviewRepository.getListAll(year);
+        } else {
+            signupList = reviewRepository.getList(applyWorkType, year);
+        }
         List<JSONObject> result = new ArrayList<>();
         for (SignUp signup : signupList) {
             Optional<User> opt = userRepository.findById(signup.getUser().getId());
@@ -68,7 +73,7 @@ public class ReviewServiceImpl implements ReviewService {
             obj.put("soldierId", user.getSoldierId());
             obj.put("applyWorkType", signup.getApplyWorkType());
             obj.put("applySkillRank", signup.getApplySkillRank());
-            obj.put("check", signup.getReview());
+            obj.put("review", signup.getReview());
             obj.put("passCard", signup.getPassCard());
             result.add(obj);
         }
@@ -97,7 +102,7 @@ public class ReviewServiceImpl implements ReviewService {
         signup.setReviewOption(reviewOption);
         signup.setAuditOpinion(auditOpinion);
         signup.setReview(check);
-        reviewRepository.saveAndFlush(signup);
+        reviewRepository.save(signup);
         return result.setAt0(false).setAt1("审核成功");
     }
 
@@ -319,7 +324,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void saveAndFlush(SignUp signUp) {
-        reviewRepository.saveAndFlush(signUp);
+        reviewRepository.save(signUp);
     }
 
     @SuppressWarnings("deprecation")

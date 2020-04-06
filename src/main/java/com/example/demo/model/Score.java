@@ -14,11 +14,7 @@ public class Score {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    /**
-     * 报名id
-     */
-    @Column(name = "sign_id")
-    private Long signId;
+
     /**
      * 分数
      */
@@ -63,15 +59,6 @@ public class Score {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-
-    public Long getSignId() {
-        return signId;
-    }
-
-    public void setSignId(Long signId) {
-        this.signId = signId;
     }
 
 

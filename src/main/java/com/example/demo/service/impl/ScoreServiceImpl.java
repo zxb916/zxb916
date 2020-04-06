@@ -88,12 +88,12 @@ public class ScoreServiceImpl implements ScoreService {
             object.put("alreadySkillRank", signUp.getAlreadySkillRank());
             object.put("Deptno", user.getDeptNo());
             object.put("armedRank", user.getArmedRank());
-            object.put("passCard", userExt.getPostCode());
-            object.put("theoryScore", score.getTheoryScore());
-            object.put("operationScore", score.getOperationScore());
-            object.put("overallScore", score.getOverallScore());
-            object.put("finalResult", score.getFinalResult());
-            object.put("certificateNo", score.getCertificateNo());
+            object.put("passCard", signUp.getPassCard());
+            object.put("theoryScore", score == null ? "" : score.getTheoryScore());
+            object.put("operationScore", score == null ? "" : score.getOperationScore());
+            object.put("overallScore", score == null ? "" : score.getOverallScore());
+            object.put("finalResult", score == null ? "" : score.getFinalResult());
+            object.put("certificateNo", score == null ? "" : score.getCertificateNo());
             result.add(object);
         }
         return result;
