@@ -99,8 +99,9 @@ public class SignUp {
     private String choice;
 
     //成績表
+
     @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = UserExt.class)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Score.class)
     private Score score;
 
     @JsonBackReference

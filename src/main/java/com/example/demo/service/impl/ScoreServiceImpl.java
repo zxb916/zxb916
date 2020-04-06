@@ -91,7 +91,7 @@ public class ScoreServiceImpl implements ScoreService {
             object.put("soldierId", user.getSoldierId());
             object.put("applyWorkType", signUp.getApplyWorkType());
             object.put("applySkillRank", signUp.getApplySkillRank());
-            object.put("Deptno", user.getDeptNo());
+            object.put("deptNo", user.getDeptNo());
             object.put("armedRank", user.getArmedRank());
             object.put("passCard", signUp.getPassCard());
             object.put("theoryScore", score == null ? "" : score.getTheoryScore());
@@ -105,19 +105,8 @@ public class ScoreServiceImpl implements ScoreService {
     }
 
     @Override
-    public void insert(String idCard, Long theoryScore, Long operationScore, Long overallScore, String finalResult, String creatTime) {
-        User user = userRepository.findByIdCardLike(idCard).get(0);
-        List<SignUp> signUpsList = signUpRepository.findByUserId(user.getId());
-        for (SignUp signUp : signUpsList) {
-            if (!StringUtils.startsWith(sdf.format(signUp.getCreateTime()), creatTime)) {
-                Score score = signUp.getScore();
-                score.setTheoryScore(theoryScore);
-                score.setOperationScore(operationScore);
-                score.setOverallScore(overallScore);
-                score.setFinalResult(finalResult);
-                scoreRepository.save(score);
-            }
-        }
+    public void insert(Score score) {
+        scoreRepository.save(score);
     }
 
     @Override

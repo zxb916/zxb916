@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import org.springframework.stereotype.Service;
+import com.example.demo.model.Score;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -14,7 +14,7 @@ public interface ScoreService {
 
     List<Object> getUserScoreList(String applyWorkType, String year);
 
-    void insert(String idCard, Long theoryScore, Long operationScore, Long overallScore, String finalResult, String creatTime);
+    void insert(Score score);
 
     void export(HttpServletResponse response, String applyWorkType, String year) throws Exception;
 

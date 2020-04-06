@@ -3,6 +3,7 @@ package com.example.demo.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -19,17 +20,17 @@ public class Score {
      * 分数
      */
     @Column(name = "theory_score")
-    private Long theoryScore;
+    private BigDecimal theoryScore;
     /**
      * 实操
      */
     @Column(name = "operation_score")
-    private Long operationScore;
+    private BigDecimal operationScore;
     /**
      * 综合成绩
      */
     @Column(name = "overall_score")
-    private Long overallScore;
+    private BigDecimal overallScore;
     /**
      * 最终结果
      */
@@ -39,7 +40,7 @@ public class Score {
      * 证书编号
      */
     @Column(name = "certificate_no")
-    private Long certificateNo;
+    private String certificateNo;
     /**
      * 创建时间
      */
@@ -50,7 +51,7 @@ public class Score {
      * 报名表
      */
     @JsonBackReference
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = User.class)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = SignUp.class)
     private SignUp signUp;
 
     public Long getId() {
@@ -62,32 +63,29 @@ public class Score {
     }
 
 
-    public Long getTheoryScore() {
+    public BigDecimal getTheoryScore() {
         return theoryScore;
     }
 
-    public void setTheoryScore(Long theoryScore) {
+    public void setTheoryScore(BigDecimal theoryScore) {
         this.theoryScore = theoryScore;
     }
 
-
-    public Long getOperationScore() {
+    public BigDecimal getOperationScore() {
         return operationScore;
     }
 
-    public void setOperationScore(Long operationScore) {
+    public void setOperationScore(BigDecimal operationScore) {
         this.operationScore = operationScore;
     }
 
-
-    public Long getOverallScore() {
+    public BigDecimal getOverallScore() {
         return overallScore;
     }
 
-    public void setOverallScore(Long overallScore) {
+    public void setOverallScore(BigDecimal overallScore) {
         this.overallScore = overallScore;
     }
-
 
     public String getFinalResult() {
         return finalResult;
@@ -98,14 +96,21 @@ public class Score {
     }
 
 
-    public Long getCertificateNo() {
+    public String getCertificateNo() {
         return certificateNo;
     }
 
-    public void setCertificateNo(Long certificateNo) {
+    public void setCertificateNo(String certificateNo) {
         this.certificateNo = certificateNo;
     }
 
+    public SignUp getSignUp() {
+        return signUp;
+    }
+
+    public void setSignUp(SignUp signUp) {
+        this.signUp = signUp;
+    }
 
     public Date getCreate_time() {
         return create_time;
