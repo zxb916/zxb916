@@ -2,8 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.bo.AdminUserDetails;
 import com.example.demo.component.JwtTokenUtil;
-import com.example.demo.model.RoleType;
-import com.example.demo.model.User;
+import com.example.demo.model.*;
 import com.example.demo.repository.ResumeRepository;
 import com.example.demo.repository.TrainRepository;
 import com.example.demo.repository.UserExtRepository;
@@ -27,9 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * UmsAdminService实现类
@@ -126,10 +123,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void update(User user) {
-//        userExtRepository.deleteByUserId(user.getId());
-//        resumeRepository.deleteByUserId(user.getId());
-//        trainRepository.deleteByUserId(user.getId());
-        adminMapper.save(user);
+
+        Set<Resume> resumes = user.getResumes();
+        Set<Train> trains = user.getTrains();
+        UserExt userExt = user.getUserExt();
+        resumeRepository.deleteByUserId(user.getId());
+        for (Resume resume : resumes) {
+            resume.setUser(user);
+            resumeRepository.save(resume);
+        }
+        trainRepository.deleteByUserId(user.getId());
+        for (Train train : trains) {
+            train.setUser(user);
+            trainRepository.save(train);
+        }
+        userExt.setUser(user);
+        userExtRepository.save(userExt);
     }
 
     @Override

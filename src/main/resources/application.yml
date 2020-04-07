@@ -12,3 +12,9 @@ jwt:
   #JWT负载中拿到开头
   tokenHead: Bearer
 #===JWT end===
+
+
+#上传文件缓存目录
+web.upload-path: D:/fileTemp/
+spring.mvc.static-path-pattern: /**
+spring.resources.static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:${web.upload-path}

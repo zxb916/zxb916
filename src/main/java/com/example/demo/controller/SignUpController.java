@@ -1,12 +1,13 @@
 package com.example.demo.controller;
 
 
-import com.example.demo.bo.AdminUserDetails;
+import com.example.demo.bo.SignUser;
 import com.example.demo.common.BaseResult;
 import com.example.demo.common.Constants;
 import com.example.demo.component.JwtTokenUtil;
 import com.example.demo.model.Attach;
 import com.example.demo.model.SignUp;
+import com.example.demo.model.User;
 import com.example.demo.service.AttachService;
 import com.example.demo.service.SignUpService;
 import com.example.demo.service.UserExtService;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @Api(value = "报名")
@@ -55,10 +55,20 @@ public class SignUpController {
 
     @ApiOperation(value = "新增报名")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public BaseResult register(@RequestBody SignUp signUp, HttpServletRequest request) {
-        AdminUserDetails adminUserDetails = jwtTokenUtil.getAdminByToken(request.getHeader(tokenHeader).substring(this.tokenHead.length()));
-        signUp.setUser(adminUserDetails.getUser());
-        signUpService.save(signUp);
+    public BaseResult register(@RequestBody SignUser signUpUser) {
+        logger.info("新增修改报名");
+        try {
+            User user = signUpUser.getUser();
+            SignUp signUp = signUpUser.getSignUp();
+            if (user.getId() == null) {
+                return new BaseResult(Constants.RESPONSE_CODE_404, "用户id不能为空");
+            }
+            userService.update(user);
+            signUp.setUser(user);
+            signUpService.save(signUp);
+        } catch (Exception e) {
+            return new BaseResult(Constants.RESPONSE_CODE_500, "逻辑异常");
+        }
         return new BaseResult(Constants.RESPONSE_CODE_200, "报名成功");
     }
 
@@ -71,7 +81,7 @@ public class SignUpController {
             if (imagePath == null) {
                 return new BaseResult(Constants.RESPONSE_CODE_404, "头像不能为空", null);
             }
-            imagePath = "http://192.168.3.55:9090/temp/" + imagePath;
+            imagePath = "http://192.168.3.55:9090/static/" + imagePath;
             Attach attach = new Attach();
             attach.setPath(imagePath);
             attach.setUuid(imagePath.substring(0, imagePath.length() - 4));
@@ -80,6 +90,7 @@ public class SignUpController {
             e.printStackTrace();
             return new BaseResult(Constants.RESPONSE_CODE_500, "头像上传失败", null);
         }
+//        logger.debug(SignUpController.class.getClassLoader().getResource("static/wgb.png").getPath());
         return new BaseResult(Constants.RESPONSE_CODE_200, "头像上传成功", imagePath);
     }
 
