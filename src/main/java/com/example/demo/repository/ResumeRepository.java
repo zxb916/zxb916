@@ -4,10 +4,10 @@ import com.example.demo.model.Resume;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 
-@Component
+@Repository
 public interface ResumeRepository extends CrudRepository<Resume, Long> {
 
     @Query(value = "delete from resume where user_id = :userId", nativeQuery = true)

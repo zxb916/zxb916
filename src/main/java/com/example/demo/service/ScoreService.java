@@ -3,8 +3,6 @@ package com.example.demo.service;
 import com.example.demo.model.Score;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,5 +16,4 @@ public interface ScoreService {
 
     void export(HttpServletResponse response, String applyWorkType, String year) throws Exception;
 
-    void upload(Long id, File file) throws FileNotFoundException;
 }

@@ -32,5 +32,12 @@ public class DemoApplication {
                 .apiInfo(new ApiInfoBuilder().version("1.0").title("sqlite Test").description("sqlite Test").build());
     }
 
+//    @Bean
+//    public MultipartResolver multipartResolver() throws IOException {
+//        CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
+//        commonsMultipartResolver.setUploadTempDir(new FileSystemResource("/temp"));
+//        return commonsMultipartResolver;
+//    }
+
 
 }

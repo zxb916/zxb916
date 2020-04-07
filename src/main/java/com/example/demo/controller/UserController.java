@@ -132,18 +132,20 @@ public class UserController extends BaseController {
     }
 
     @ApiOperation(value = "重置密码")
-    @GetMapping(value = "/resetPassword")
-    public BaseResult refreshToken(@RequestParam("idCard") String idCard) {
-        logger.info("重置密码" + idCard);
-        if (idCard == null) {
+    @PostMapping(value = "/resetPassword")
+    public BaseResult refreshToken(@RequestBody String str) {
+        Map<String, String> object = (Map<String, String>) JSONObject.parse(str);
+        logger.info("重置密码" + str);
+        if (object.get("idCard") == null) {
             return new BaseResult(Constants.RESPONSE_CODE_500, "idCard不能为null");
         }
-        AdminUserDetails adminUserDetails = userService.getAdminByIdCard(idCard);
+        AdminUserDetails adminUserDetails = userService.getAdminByIdCard(object.get("idCard"));
         if (adminUserDetails == null) {
             return new BaseResult(Constants.RESPONSE_CODE_404, "该用户不存在");
         }
         User user = adminUserDetails.getUser();
         String hashed = BCrypt.hashpw("123456", BCrypt.gensalt(12));
+        user.setOldPassword("123456");
         user.setPassword(hashed);
         userService.save(user);
         return new BaseResult(Constants.RESPONSE_CODE_200, "重置密码成功");

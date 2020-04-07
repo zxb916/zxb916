@@ -52,7 +52,7 @@ public class ScoreServiceImpl implements ScoreService {
         User user = userRepository.findByIdCardLike(idCard).get(0);
         List<SignUp> signUpsList = signUpRepository.findByUserId(user.getId());
         for (SignUp signUp : signUpsList) {
-            if (!StringUtils.startsWith(sdf.format(signUp.getCreateTime()), year)) {
+            if (StringUtils.startsWith(signUp.getCreateTime(), year)) {
                 JSONObject object = new JSONObject();
                 Score userScore = scoreRepository.getUserScore(signUp.getId());
                 object.put("userName", user.getUserName());
@@ -138,25 +138,6 @@ public class ScoreServiceImpl implements ScoreService {
 
         //浏览器下载excel
         buildExcelDocument(fileName, workbook, response);
-    }
-
-
-    @Override
-    public void upload(Long id, File file) {
-        if (null == file) {
-            logger.info("没有传文件或获取不到文件");
-        }
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            UserExt userExt = userExtRepository.getOne(id);
-            userExt.setProfilePhoto(fileOutputStream.toString());
-            userExtRepository.save(userExt);
-            fileOutputStream.close();
-        } catch (FileNotFoundException e) {
-            logger.info(e.getMessage());
-        } catch (IOException e) {
-            logger.info(e.getMessage());
-        }
     }
 
 

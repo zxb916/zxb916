@@ -11,7 +11,7 @@ public interface UserExtService {
     /**
      * 更新userExt
      */
-    UserExt register(UserExt userExt);
+    UserExt update(UserExt userExt);
 
 
 }

@@ -21,7 +21,7 @@ public class UserExtServiceImpl implements UserExtService {
 
 
     @Override
-    public UserExt register(UserExt userExt) {
-        return userExtRepository.saveAndFlush(userExt);
+    public UserExt update(UserExt userExt) {
+        return userExtRepository.save(userExt);
     }
 }

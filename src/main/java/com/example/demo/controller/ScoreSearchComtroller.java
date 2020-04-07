@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,11 +80,17 @@ public class ScoreSearchComtroller extends BaseController {
             SignUp signUp = signUpService.findByUserIdAndYear(userId, year);
             if (signUp.getScore() != null) {
                 BeanUtils.copyProperties(score, signUp.getScore(), BeanCopy.getNullPropertyNames(score));
+                signUpService.save(signUp);
+            } else {
+                //新增
+                score.setSignUp(signUp);
+                signUp.setScore(score);
+                signUpService.save(signUp);
             }
-            scoreService.insert(signUp.getScore());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
+            return new BaseResult(Constants.RESPONSE_CODE_200, "插入成绩失败", e.getMessage());
         }
         return new BaseResult(Constants.RESPONSE_CODE_200, "插入成绩成功");
     }
@@ -100,20 +104,6 @@ public class ScoreSearchComtroller extends BaseController {
         }
         scoreService.export(response, applyWorkType, year);
         return new BaseResult(Constants.RESPONSE_CODE_200, "导出成绩成功");
-    }
-
-    //上传附件
-    @ApiOperation(value = "上传附件")
-    @PostMapping(value = "/upload")
-    public BaseResult upload(Long id, File file) throws Exception {
-        DecimalFormat df = new DecimalFormat("0.00");// 格式化小数
-        if (Integer.valueOf(df.format(file.length() / 1024)) > 512) {
-            return new BaseResult(Constants.RESPONSE_CODE_500, "文件过大，请重新上传");
-        }
-        String filePath = file.getAbsolutePath();
-        String fileName = file.getName();
-        scoreService.upload(id, file);
-        return new BaseResult(Constants.RESPONSE_CODE_200, "上传附件成功");
     }
 
 
