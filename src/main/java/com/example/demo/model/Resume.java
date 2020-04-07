@@ -1,6 +1,8 @@
 package com.example.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -33,7 +35,7 @@ public class Resume {
     private String majorName;
 
     @JsonBackReference
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = User.class)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = User.class)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -88,5 +90,35 @@ public class Resume {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Resume resume = (Resume) o;
+
+        return new EqualsBuilder()
+                .append(id, resume.id)
+                .append(startTime, resume.startTime)
+                .append(endTime, resume.endTime)
+                .append(unit, resume.unit)
+                .append(majorName, resume.majorName)
+                .append(user, resume.user)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(startTime)
+                .append(endTime)
+                .append(unit)
+                .append(majorName)
+                .append(user)
+                .toHashCode();
     }
 }

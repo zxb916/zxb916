@@ -101,15 +101,16 @@ public class User {
      * 用户元信息
      */
     @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = UserExt.class)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = UserExt.class, orphanRemoval = true)
+    @JoinColumn(name = "userExt_id")
     private UserExt userExt;
 
     @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, targetEntity = Resume.class)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Resume.class)
     private Set<Resume> resumes;
 
     @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, targetEntity = Train.class)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Train.class)
     private Set<Train> trains;
 
 
@@ -258,4 +259,5 @@ public class User {
     public void setOldPassword(String oldPassword) {
         this.oldPassword = oldPassword;
     }
+    
 }

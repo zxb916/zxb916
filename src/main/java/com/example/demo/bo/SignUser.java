@@ -10,6 +10,7 @@ public class SignUser {
 
     private SignUp signUp;
 
+    private String year;
 
     public User getUser() {
         return user;
@@ -25,5 +26,13 @@ public class SignUser {
 
     public void setSignUp(SignUp signUp) {
         this.signUp = signUp;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
     }
 }

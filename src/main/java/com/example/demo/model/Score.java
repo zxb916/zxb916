@@ -51,7 +51,7 @@ public class Score {
      * 报名表
      */
     @JsonBackReference
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = SignUp.class)
+    @OneToOne(fetch = FetchType.EAGER, targetEntity = SignUp.class)
     private SignUp signUp;
 
     public Long getId() {

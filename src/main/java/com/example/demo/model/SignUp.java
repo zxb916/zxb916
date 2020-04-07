@@ -1,7 +1,6 @@
 package com.example.demo.model;
 
 import com.example.demo.util.DateFormatUtils;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -101,13 +100,11 @@ public class SignUp {
     //成績表
 
     @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Score.class)
+    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER, targetEntity = Score.class)
     private Score score;
 
-    @JsonBackReference
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = User.class)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Long userId;
 
     public Long getId() {
         return id;
@@ -251,12 +248,16 @@ public class SignUp {
         this.choice = choice;
     }
 
-    public User getUser() {
-        return user;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Score getScore() {

@@ -12,11 +12,13 @@ import com.example.demo.service.AttachService;
 import com.example.demo.service.SignUpService;
 import com.example.demo.service.UserExtService;
 import com.example.demo.service.UserService;
+import com.example.demo.util.BeanCopy;
 import com.example.demo.util.UploadFileUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,7 +57,7 @@ public class SignUpController {
 
     @ApiOperation(value = "新增报名")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public BaseResult register(@RequestBody SignUser signUpUser) {
+    public BaseResult add(@RequestBody SignUser signUpUser) {
         logger.info("新增修改报名");
         try {
             User user = signUpUser.getUser();
@@ -63,13 +65,22 @@ public class SignUpController {
             if (user.getId() == null) {
                 return new BaseResult(Constants.RESPONSE_CODE_404, "用户id不能为空");
             }
-            userService.update(user);
-            signUp.setUser(user);
-            signUpService.save(signUp);
+            User oldUser = userService.getItem(user.getId()).get();
+            BeanUtils.copyProperties(user, oldUser, BeanCopy.getNullPropertyNames(user));
+            userService.update(oldUser, user);
+            SignUp signUp1 = signUpService.findByUserIdAndYear(user.getId(), signUpUser.getYear());
+            if (signUp1 != null) {
+                BeanUtils.copyProperties(signUp, signUp1, BeanCopy.getNullPropertyNames(signUp));
+                signUpService.save(signUp1);
+            } else {
+                signUp.setUserId(user.getId());
+                signUpService.save(signUp);
+            }
         } catch (Exception e) {
+            e.printStackTrace();
             return new BaseResult(Constants.RESPONSE_CODE_500, "逻辑异常");
         }
-        return new BaseResult(Constants.RESPONSE_CODE_200, "报名成功");
+        return new BaseResult(Constants.RESPONSE_CODE_200, "修改用户信息成功");
     }
 
     @ApiOperation(value = "上传文件")

@@ -55,7 +55,7 @@ public interface UserService {
     /**
      * 修改指定用户信息
      */
-    void update(User user);
+    User update(User oldUser, User user);
 
     /**
      * 新增用户

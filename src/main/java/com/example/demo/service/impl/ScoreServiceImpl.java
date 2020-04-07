@@ -82,10 +82,10 @@ public class ScoreServiceImpl implements ScoreService {
         for (SignUp signUp : signUpList) {
             JSONObject object = new JSONObject();
             Score score = signUp.getScore();
-            User user = signUp.getUser();
-            UserExt userExt = signUp.getUser().getUserExt();
+            User user = userRepository.findById(signUp.getUserId()).get();
+            UserExt userExt = user.getUserExt();
             object.put("id", signUp.getId());
-            object.put("userId", signUp.getUser().getId());
+            object.put("userId", user.getId());
             object.put("userName", user.getUserName());
             object.put("idCard", user.getIdCard());
             object.put("soldierId", user.getSoldierId());

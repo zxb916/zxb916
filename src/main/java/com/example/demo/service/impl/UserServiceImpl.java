@@ -122,23 +122,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void update(User user) {
-
-        Set<Resume> resumes = user.getResumes();
-        Set<Train> trains = user.getTrains();
-        UserExt userExt = user.getUserExt();
-        resumeRepository.deleteByUserId(user.getId());
-        for (Resume resume : resumes) {
-            resume.setUser(user);
-            resumeRepository.save(resume);
+    public User update(User oldUser, User user) {
+        for (Resume o : oldUser.getResumes()) {
+            o.setUser(null);
+            resumeRepository.delete(o);
         }
-        trainRepository.deleteByUserId(user.getId());
-        for (Train train : trains) {
-            train.setUser(user);
-            trainRepository.save(train);
+        for (Train o : oldUser.getTrains()) {
+            o.setUser(null);
+            trainRepository.delete(o);
         }
-        userExt.setUser(user);
-        userExtRepository.save(userExt);
+        if (oldUser.getUserExt() != null) {
+            UserExt userExt = oldUser.getUserExt();
+            userExt.setUser(null);
+            userExtRepository.delete(userExt);
+        }
+        oldUser.getUserExt().setUser(user);
+        for (Resume o : oldUser.getResumes()) {
+            o.setUser(oldUser);
+        }
+        for (Train o : oldUser.getTrains()) {
+            o.setUser(oldUser);
+        }
+        oldUser = adminMapper.save(oldUser);
+        return oldUser;
     }
 
     @Override

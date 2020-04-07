@@ -1,6 +1,8 @@
 package com.example.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -42,7 +44,7 @@ public class Train {
 
 
     @JsonBackReference
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = User.class)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = User.class)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -106,5 +108,37 @@ public class Train {
 
     public void setCount(Integer count) {
         this.count = count;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Train train = (Train) o;
+
+        return new EqualsBuilder()
+                .append(id, train.id)
+                .append(startTime, train.startTime)
+                .append(endTime, train.endTime)
+                .append(unit, train.unit)
+                .append(majorName, train.majorName)
+                .append(count, train.count)
+                .append(user, train.user)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(startTime)
+                .append(endTime)
+                .append(unit)
+                .append(majorName)
+                .append(count)
+                .append(user)
+                .toHashCode();
     }
 }

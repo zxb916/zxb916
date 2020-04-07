@@ -65,7 +65,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
         List<JSONObject> result = new ArrayList<>();
         for (SignUp signup : signupList) {
-            Optional<User> opt = userRepository.findById(signup.getUser().getId());
+            Optional<User> opt = userRepository.findById(signup.getUserId());
             User user = opt.get();
             JSONObject obj = new JSONObject();
             obj.put("userName", user.getUserName());
@@ -146,7 +146,7 @@ public class ReviewServiceImpl implements ReviewService {
         List<SignUp> reviewList = reviewRepository.getReviewList(applyWorkType, createTime);
         for (SignUp signup : reviewList) {
             JSONObject result = new JSONObject();
-            User user = userRepository.findById(signup.getUser().getId()).get();
+            User user = userRepository.findById(signup.getUserId()).get();
             result.put("userName", user.getUserName());
             result.put("sex", user.getUserExt().getSex());
             result.put("deptNo", user.getDeptNo());
@@ -265,7 +265,7 @@ public class ReviewServiceImpl implements ReviewService {
         resultMap.put("idCard", user.getIdCard());
         resultMap.put("birthday", user.getUserExt().getBirthday() != null ? sdf1.format(user.getUserExt().getBirthday()) : "");
         resultMap.put("soldierId", user.getSoldierId());
-        resultMap.put("degree", user.getUserExt().getDegree() == null ? "" :user.getUserExt().getDegree());
+        resultMap.put("degree", user.getUserExt().getDegree() == null ? "" : user.getUserExt().getDegree());
         resultMap.put("deptno", user.getDeptNo());
         resultMap.put("mobile", user.getMobile());
         resultMap.put("mailingAddress", user.getMailingAddress());
