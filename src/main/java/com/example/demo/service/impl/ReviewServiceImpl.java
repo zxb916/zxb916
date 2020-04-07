@@ -86,7 +86,7 @@ public class ReviewServiceImpl implements ReviewService {
         JSONObject param = JSONObject.parseObject(requestParam);
         String idCard = param.get("idCard").toString();
         String reviewOption = param.get("reviewOption").toString();
-        String auditOpinion = param.get("auditOpinion").toString();
+//        String auditOpinion = param.get("auditOpinion").toString();
         Integer check = Integer.parseInt(param.get("check").toString());
         if (StringUtils.isEmpty(idCard)) {
             return result.setAt1("身份证不能为空");
@@ -94,13 +94,13 @@ public class ReviewServiceImpl implements ReviewService {
         if (StringUtils.isEmpty(param.get("reviewOption").toString())) {
             return result.setAt1("审核意见不能为空");
         }
-        if (StringUtils.isEmpty(param.get("review").toString())) {
-            return result.setAt1("审核不能为空");
-        }
+//        if (StringUtils.isEmpty(param.get("review").toString())) {
+//            return result.setAt1("审核不能为空");
+//        }
         User user = userRepository.findByIdCardLike(idCard).get(0);
         SignUp signup = reviewRepository.findByUserId(user.getId());
         signup.setReviewOption(reviewOption);
-        signup.setAuditOpinion(auditOpinion);
+//        signup.setAuditOpinion(auditOpinion);
         signup.setReview(check);
         reviewRepository.save(signup);
         return result.setAt0(false).setAt1("审核成功");
@@ -250,7 +250,7 @@ public class ReviewServiceImpl implements ReviewService {
         SignUp signup = null;
         List<SignUp> signUps = signUpRepository.findByUserId(user.getId());
         for (SignUp sign : signUps) {
-            if (StringUtils.startsWith(sdf.format(sign.getCreateTime()), year)) {
+            if (StringUtils.startsWith(sign.getCreateTime(), year)) {
                 signup = sign;
             }
         }
@@ -258,14 +258,14 @@ public class ReviewServiceImpl implements ReviewService {
         resultMap.put("name", "solider");
         resultMap.put("applyWorkType", signup.getApplyWorkType());
         resultMap.put("userName", user.getUserName());
-        resultMap.put("createTime", sdf1.format(signup.getCreateTime()));
+        resultMap.put("createTime", signup.getCreateTime());
         resultMap.put("userName", user.getUserName());
         resultMap.put("sex", user.getUserExt().getSex());
         resultMap.put("profilePhoto", ImgBase64.getImgStr("src/main/resources/2.png"));
         resultMap.put("idCard", user.getIdCard());
         resultMap.put("birthday", user.getUserExt().getBirthday() != null ? sdf1.format(user.getUserExt().getBirthday()) : "");
         resultMap.put("soldierId", user.getSoldierId());
-        resultMap.put("degree", user.getUserExt().getDegree());
+        resultMap.put("degree", user.getUserExt().getDegree() == null ? "" :user.getUserExt().getDegree());
         resultMap.put("deptno", user.getDeptNo());
         resultMap.put("mobile", user.getMobile());
         resultMap.put("mailingAddress", user.getMailingAddress());

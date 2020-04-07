@@ -71,7 +71,7 @@ public class ReviewController extends BaseController {
             String requestParam = IOUtils.toString(request.getInputStream(), String.valueOf(StandardCharsets.UTF_8));
             Pair<Boolean, String> result = reviewService.checkAndSave(requestParam);
             if (!result.getValue0()) {
-                return new BaseResult(Constants.RESPONSE_CODE_500, result.getValue1());
+                return new BaseResult(Constants.RESPONSE_CODE_200, result.getValue1());
             }
             return new BaseResult(Constants.RESPONSE_CODE_200, result.getValue1());
         } catch (IOException e) {
