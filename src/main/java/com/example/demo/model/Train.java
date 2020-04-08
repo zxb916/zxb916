@@ -1,18 +1,17 @@
 package com.example.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @Table(name = "train")
-public class Train {
+public class Train implements Comparable<Train> {
     /**
      * 主键id
      */
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -20,12 +19,12 @@ public class Train {
      * 开始时间
      */
     @Column(name = "start_time")
-    private Date startTime;
+    private String startTime;
     /**
      * 结束时间
      */
     @Column(name = "end_time")
-    private Date endTime;
+    private String endTime;
     /**
      * 所在单位
      */
@@ -40,8 +39,10 @@ public class Train {
      * 标准学时数
      */
     @Column(name = "count")
-    private Integer count;
+    private String count;
 
+    @Column(name = "sub")
+    private Integer sub;
 
     @JsonBackReference
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = User.class)
@@ -65,25 +66,6 @@ public class Train {
         this.id = id;
     }
 
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
-
     public String getUnit() {
         return unit;
     }
@@ -101,44 +83,46 @@ public class Train {
         this.majorName = majorName;
     }
 
+    public String getStartTime() {
+        return startTime;
+    }
 
-    public Integer getCount() {
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getCount() {
         return count;
     }
 
-    public void setCount(Integer count) {
+    public void setCount(String count) {
         this.count = count;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
+    public Integer getSub() {
+        return sub;
+    }
 
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Train train = (Train) o;
-
-        return new EqualsBuilder()
-                .append(id, train.id)
-                .append(startTime, train.startTime)
-                .append(endTime, train.endTime)
-                .append(unit, train.unit)
-                .append(majorName, train.majorName)
-                .append(count, train.count)
-                .append(user, train.user)
-                .isEquals();
+    public void setSub(Integer sub) {
+        this.sub = sub;
     }
 
     @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(id)
-                .append(startTime)
-                .append(endTime)
-                .append(unit)
-                .append(majorName)
-                .append(count)
-                .append(user)
-                .toHashCode();
+    public int compareTo(Train o) {
+        if (this.sub < o.getSub()) {
+            return 1;
+        } else if (this.sub > o.getSub()) {
+            return -1;
+        } else {
+            return this.startTime.compareTo(o.getStartTime());  // 调用String中的compareTo()方法
+        }
     }
 }

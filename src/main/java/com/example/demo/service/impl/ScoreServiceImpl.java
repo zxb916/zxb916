@@ -56,13 +56,13 @@ public class ScoreServiceImpl implements ScoreService {
                 JSONObject object = new JSONObject();
                 Score userScore = scoreRepository.getUserScore(signUp.getId());
                 object.put("userName", user.getUserName());
-                object.put("alreadyWorkType", signUp.getAlreadyWorkType());
-                object.put("alreadySkillRank", signUp.getAlreadySkillRank());
-                object.put("theoryScore", userScore.getTheoryScore());
-                object.put("operationScore", userScore.getOperationScore());
-                object.put("overallScore", userScore.getOverallScore());
-                object.put("finalResult", userScore.getFinalResult());
-                object.put("certificateNo", userScore.getCertificateNo());
+                object.put("applyWorkType", signUp.getApplyWorkType());
+                object.put("applySkillRank", signUp.getApplySkillRank());
+                object.put("theoryScore", userScore == null ? "" : userScore.getTheoryScore());
+                object.put("operationScore", userScore == null ? "" : userScore.getOperationScore());
+                object.put("overallScore", userScore == null ? "" : userScore.getOverallScore());
+                object.put("finalResult", userScore == null ? "" : userScore.getFinalResult());
+                object.put("certificateNo", userScore == null ? "" : userScore.getCertificateNo());
                 result.add(object);
             }
         }

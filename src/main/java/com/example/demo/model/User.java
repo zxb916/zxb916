@@ -113,7 +113,6 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Train.class)
     private Set<Train> trains;
 
-
     public Set<Resume> getResumes() {
         return resumes;
     }
@@ -259,5 +258,5 @@ public class User {
     public void setOldPassword(String oldPassword) {
         this.oldPassword = oldPassword;
     }
-    
+
 }
