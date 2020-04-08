@@ -41,11 +41,13 @@ public class SignUpController {
     private SignUpService signUpService;
     @Autowired
     private UserExtService userExtService;
-
     @Value("${jwt.tokenHeader}")
     private String tokenHeader;
     @Value("${jwt.tokenHead}")
     private String tokenHead;
+    @Value("${web.upload-path}")
+    private String uploadPath;
+
     @Autowired
     private AttachService attachService;
 
@@ -90,7 +92,7 @@ public class SignUpController {
     public BaseResult upload(MultipartFile uploadfile) throws IOException {
         String imagePath = null;
         try {
-            imagePath = UploadFileUtils.upload(uploadfile);
+            imagePath = UploadFileUtils.upload(uploadfile, uploadPath);
             if (imagePath == null) {
                 return new BaseResult(Constants.RESPONSE_CODE_404, "头像不能为空", null);
             }
@@ -103,7 +105,6 @@ public class SignUpController {
             e.printStackTrace();
             return new BaseResult(Constants.RESPONSE_CODE_500, "头像上传失败", null);
         }
-//        logger.debug(SignUpController.class.getClassLoader().getResource("static/wgb.png").getPath());
         return new BaseResult(Constants.RESPONSE_CODE_200, "头像上传成功", imagePath);
     }
 

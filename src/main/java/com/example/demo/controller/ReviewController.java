@@ -8,9 +8,6 @@ import com.example.demo.model.User;
 import com.example.demo.service.ReviewService;
 import com.example.demo.service.SignUpService;
 import com.example.demo.service.UserService;
-import com.jacob.activeX.ActiveXComponent;
-import com.jacob.com.ComThread;
-import com.jacob.com.Variant;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.FileUtils;
@@ -108,6 +105,7 @@ public class ReviewController extends BaseController {
     @GetMapping(PATH_CREATE_REPORT)
     public void createReport(@RequestParam("idCard") String idCard, @RequestParam("year") String year, HttpServletResponse response) throws IOException {
         File reportFile = reviewService.build(idCard, year);
+        File open = reviewService.open(reportFile.getAbsolutePath(), "Word.Application", false);
         if (reportFile == null) {
             new BaseResult(Constants.RESPONSE_CODE_500, "生成报表失败");
         }
@@ -117,9 +115,8 @@ public class ReviewController extends BaseController {
             response.setCharacterEncoding("utf-8");
             response.setContentType("multipart/form-data");
             // 设置浏览器以下载的方式处理该文件名
-            response.setHeader("Content-Disposition", "attachment;filename=".concat(URLEncoder.encode("士兵报名表".concat(".doc"), "UTF-8")));
-            IOUtils.write(FileUtils.readFileToByteArray(reportFile), response.getOutputStream());
-
+            response.setHeader("Content-Disposition", "attachment;filename=".concat(URLEncoder.encode("士兵报名表".concat(".pdf"), "UTF-8")));
+            IOUtils.write(FileUtils.readFileToByteArray(open), response.getOutputStream());
         } catch (Exception e) {
             e.printStackTrace();
             response.setContentType("application/json");
@@ -130,33 +127,5 @@ public class ReviewController extends BaseController {
         // 删除临时文件
 //        FileUtils.deleteQuietly(reportFile);
     }
-
-    public boolean wpsTopdf(String srcFilePath, String pdfFilePath) throws Exception {
-        // wps com
-        ActiveXComponent pptActiveXComponent = null;
-        ActiveXComponent workbook = null;
-        // open thred
-        ComThread.InitSTA();
-        try {
-            pptActiveXComponent = new ActiveXComponent("KWPP.Application");
-            Variant openParams[] = {new Variant(srcFilePath), new Variant(true), new Variant(true)};
-            workbook = pptActiveXComponent.invokeGetComponent("Documents").invokeGetComponent("Open", openParams);
-            workbook.invoke("SaveAs", new Variant[]{new Variant(pdfFilePath), new Variant(17)});
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            if (workbook != null) {
-                workbook.invoke("Close");
-                workbook.safeRelease();
-            }
-            if (pptActiveXComponent != null) {
-                pptActiveXComponent.invoke("Quit");
-                pptActiveXComponent.safeRelease();
-            }
-            ComThread.Release();
-        }
-        return true;
-    }
-
 
 }

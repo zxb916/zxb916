@@ -15,17 +15,15 @@ public class UploadFileUtils {
     //打印log日志
     private static final Logger logger = LoggerFactory.getLogger(UploadFileUtils.class);
 
-    private static String dirPath;
 
-    public static String upload(MultipartFile uploadfile) throws NoSuchAlgorithmException, IOException {
+    public static String upload(MultipartFile uploadfile, String dirPath) throws NoSuchAlgorithmException, IOException {
         if (null == uploadfile) {
             logger.info("没有传文件或获取不到文件");
             return null;
         }
-
         // 解决中文问题，liunx下中文路径，图片显示问题
         String fileName = UUIDGenerator.generateUUID() + ".jpg";
-        String uploadWholeFilePath = getPath() + fileName;
+        String uploadWholeFilePath = dirPath + fileName;
         logger.info("上传的文件及目录为：" + uploadWholeFilePath);
         File dest = new File(uploadWholeFilePath);
         // 检测是否存在目录
@@ -37,14 +35,5 @@ public class UploadFileUtils {
         return fileName;
     }
 
-    /*
-     *  生成目录
-     * */
-    private static String getPath() {
-        if (dirPath == null) {
-            dirPath = Class.class.getClass().getResource("/").getPath() + "temp\\";
-        }
-        return dirPath;
-    }
 
 }

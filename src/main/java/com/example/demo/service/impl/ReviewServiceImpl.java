@@ -10,6 +10,9 @@ import com.example.demo.repository.SignUpRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.ReviewService;
 import com.example.demo.util.ImgBase64;
+import com.jacob.activeX.ActiveXComponent;
+import com.jacob.com.Dispatch;
+import com.jacob.com.Variant;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -21,6 +24,7 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +38,8 @@ import java.util.*;
 @Service
 public class ReviewServiceImpl implements ReviewService {
 
+    @Value("${web.upload-path}")
+    private String uploadPath;
     @Autowired
     private ReviewRepository reviewRepository;
     @Autowired
@@ -261,7 +267,7 @@ public class ReviewServiceImpl implements ReviewService {
         resultMap.put("createTime", signup.getCreateTime());
         resultMap.put("userName", user.getUserName());
         resultMap.put("sex", user.getUserExt().getSex());
-        resultMap.put("profilePhoto", ImgBase64.getImgStr("src/main/resources/2.png"));
+        resultMap.put("profilePhoto", ImgBase64.getImgStr(uploadPath + user.getUserExt().getProfilePhoto().split("/")[user.getUserExt().getProfilePhoto().split("/").length - 1]));
         resultMap.put("idCard", user.getIdCard());
         resultMap.put("birthday", user.getUserExt().getBirthday() != null ? sdf1.format(user.getUserExt().getBirthday()) : "");
         resultMap.put("soldierId", user.getSoldierId());
@@ -348,5 +354,36 @@ public class ReviewServiceImpl implements ReviewService {
             IOUtils.closeQuietly(writer);
         }
         return docFile;
+    }
+
+    public File open(String filePath, String type, boolean visible) {
+        try {
+            ActiveXComponent app = new ActiveXComponent(type);
+            app.setProperty("Visible", new Variant(visible));
+            Dispatch documents = app.getProperty("Documents").toDispatch();
+            Dispatch document = Dispatch.call(documents, "Open", filePath).toDispatch();
+            System.out.println("JacobUtil.class : 打开文档   " + filePath);
+            try {
+                Dispatch.call(document, "SaveAs", "C:\\Users\\huaruiview\\Desktop\\1.pdf", new Variant(17));
+            } catch (Exception e) {
+                System.err.println("JacobUtil.class : 文档转换为pdf失败！");
+                e.printStackTrace();
+            }
+            try {
+                Dispatch.call(document, "Close", false);
+                if (app != null) {
+                    app.invoke("Quit", new Variant[]{});
+                    app = null;
+                }
+                System.out.println("JacobUtil.class : 文档关闭  " + filePath);
+            } catch (Exception e) {
+                System.err.println("关闭ActiveXComponent异常");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.err.println("JacobUtil.class : 打开文档失败 " + filePath);
+            e.printStackTrace();
+        }
+        return new File("C:\\Users\\huaruiview\\Desktop\\1.pdf");
     }
 }

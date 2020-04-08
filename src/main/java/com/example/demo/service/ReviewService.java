@@ -36,4 +36,6 @@ public interface ReviewService {
 
 
     void saveAndFlush(SignUp signUp);
+
+    File open(String filePath, String type, boolean visible);
 }
