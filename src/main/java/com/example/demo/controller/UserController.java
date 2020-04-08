@@ -7,7 +7,9 @@ import com.example.demo.common.BaseController;
 import com.example.demo.common.BaseResult;
 import com.example.demo.common.Constants;
 import com.example.demo.component.JwtTokenUtil;
+import com.example.demo.model.Resume;
 import com.example.demo.model.SignUp;
+import com.example.demo.model.Train;
 import com.example.demo.model.User;
 import com.example.demo.service.SignUpService;
 import com.example.demo.service.UserService;
@@ -30,9 +32,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Api(value = "用户")
 @RestController
@@ -205,6 +205,10 @@ public class UserController extends BaseController {
                 user = adminUserDetails.getUser();
             }
             SignUp signUp = signUpService.findByUserIdAndYear(user.getId(), year);
+            Set<Resume> sortSet = new TreeSet<Resume>((o1, o2) -> o1.getSub().compareTo(o2.getSub()));
+            sortSet.addAll(user.getResumes());
+            Set<Train> sortSet1 = new TreeSet<Train>((o1, o2) -> o1.getSub().compareTo(o2.getSub()));
+            sortSet1.addAll(user.getTrains());
             map.put("user", user);
             map.put("signUp", signUp);
         } catch (Exception e) {

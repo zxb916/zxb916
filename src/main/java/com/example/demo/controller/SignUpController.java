@@ -96,7 +96,7 @@ public class SignUpController {
             if (imagePath == null) {
                 return new BaseResult(Constants.RESPONSE_CODE_404, "头像不能为空", null);
             }
-            imagePath = "http://192.168.3.55:9090/static/" + imagePath;
+            imagePath = "http://127.0.0.1:9090/static/" + imagePath;
             Attach attach = new Attach();
             attach.setPath(imagePath);
             attach.setUuid(imagePath.substring(0, imagePath.length() - 4));

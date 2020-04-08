@@ -247,7 +247,7 @@ public class ReviewServiceImpl implements ReviewService {
         resultMap.put("name", "solider");
         resultMap.put("applyWorkType", signup.getApplyWorkType());
         resultMap.put("userName", user.getUserName());
-        resultMap.put("createTime", signup.getCreateTime());
+        resultMap.put("createTime", signup.getCreateTime().split(" ")[0]);
         resultMap.put("userName", user.getUserName());
         resultMap.put("sex", user.getUserExt().getSex());
         resultMap.put("profilePhoto", ImgBase64.getImgStr(uploadPath + user.getUserExt().getProfilePhoto().split("/")[user.getUserExt().getProfilePhoto().split("/").length - 1]));
@@ -259,10 +259,10 @@ public class ReviewServiceImpl implements ReviewService {
         resultMap.put("mobile", user.getMobile());
         resultMap.put("mailingAddress", user.getMailingAddress());
         resultMap.put("postCode", user.getUserExt().getPostCode());
-        resultMap.put("alreadyWorkType", signup.getAlreadyWorkType());
-        resultMap.put("alreadySkillRank", signup.getApplySkillRank());
-        resultMap.put("alreadyCertificateNo", signup.getAlreadyCertificateNo());
-        resultMap.put("alreadyIssueDate", sdf1.format(signup.getAlreadyIssueDate()));
+        resultMap.put("alreadyWorkType", signup.getAlreadyWorkType() == null ? "" : signup.getAlreadyWorkType());
+        resultMap.put("alreadySkillRank", signup.getApplySkillRank() == null ? "" : signup.getApplySkillRank());
+        resultMap.put("alreadyCertificateNo", signup.getAlreadyCertificateNo() == null ? "" : signup.getAlreadyCertificateNo());
+        resultMap.put("alreadyIssueDate", signup.getAlreadyIssueDate() == null ? "" : sdf1.format(signup.getAlreadyIssueDate()));
         resultMap.put("applyWorkType", signup.getApplyWorkType());
         resultMap.put("applySkillRank", signup.getApplySkillRank());
         if (signup.getChoice().equals("0")) {
@@ -280,8 +280,8 @@ public class ReviewServiceImpl implements ReviewService {
         }
         int index = 1;
         for (Resume resume : user.getResumes()) {
-            resultMap.put("startTime" + index, sdf1.format(resume.getStartTime()));
-            resultMap.put("endTime" + index, sdf1.format(resume.getEndTime()));
+            resultMap.put("startTime" + index, resume.getStartTime());
+            resultMap.put("endTime" + index, resume.getEndTime());
             resultMap.put("unit" + index, resume.getUnit());
             resultMap.put("majorName" + index, resume.getMajorName());
             index++;
@@ -294,8 +294,8 @@ public class ReviewServiceImpl implements ReviewService {
         }
         index = 1;
         for (Train train : user.getTrains()) {
-            resultMap.put("startTime" + index, sdf1.format(train.getStartTime()));
-            resultMap.put("endTime" + index, sdf1.format(train.getEndTime()));
+            resultMap.put("startTime" + index, train.getStartTime());
+            resultMap.put("endTime" + index, train.getEndTime());
             resultMap.put("unit" + index, train.getUnit());
             resultMap.put("majorName" + index, train.getMajorName());
             resultMap.put("count" + index, train.getCount() == null ? "" : train.getCount().toString());

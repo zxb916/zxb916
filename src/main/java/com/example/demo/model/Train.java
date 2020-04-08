@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "train")
-public class Train implements Comparable<Train> {
+public class Train {
     /**
      * 主键id
      */
@@ -113,16 +113,5 @@ public class Train implements Comparable<Train> {
 
     public void setSub(Integer sub) {
         this.sub = sub;
-    }
-
-    @Override
-    public int compareTo(Train o) {
-        if (this.sub < o.getSub()) {
-            return 1;
-        } else if (this.sub > o.getSub()) {
-            return -1;
-        } else {
-            return this.startTime.compareTo(o.getStartTime());  // 调用String中的compareTo()方法
-        }
     }
 }

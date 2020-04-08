@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "resume")
-public class Resume implements Comparable<Resume> {
+public class Resume {
     @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -102,13 +102,15 @@ public class Resume implements Comparable<Resume> {
     }
 
     @Override
-    public int compareTo(Resume o) {
-        if (this.sub < o.getSub()) {
-            return 1;
-        } else if (this.sub > o.getSub()) {
-            return -1;
-        } else {
-            return this.startTime.compareTo(o.getStartTime());  // 调用String中的compareTo()方法
-        }
+    public String toString() {
+        return "Resume{" +
+                "id=" + id +
+                ", startTime='" + startTime + '\'' +
+                ", endTime='" + endTime + '\'' +
+                ", unit='" + unit + '\'' +
+                ", majorName='" + majorName + '\'' +
+                ", sub=" + sub +
+                ", user=" + user +
+                '}';
     }
 }

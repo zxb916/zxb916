@@ -126,10 +126,12 @@ public class UserServiceImpl implements UserService {
         for (Resume o : oldUser.getResumes()) {
             o.setUser(null);
             resumeRepository.delete(o);
+//            resumeRepository.deleteByUserId(oldUser.getId());
         }
         for (Train o : oldUser.getTrains()) {
             o.setUser(null);
             trainRepository.delete(o);
+//            trainRepository.deleteByUserId(oldUser.getId());
         }
         if (oldUser.getUserExt() != null) {
             UserExt userExt = oldUser.getUserExt();
