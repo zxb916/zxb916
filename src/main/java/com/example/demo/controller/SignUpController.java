@@ -71,9 +71,11 @@ public class SignUpController {
             SignUp signUp1 = signUpService.findByUserIdAndYear(user.getId(), signUpUser.getYear());
             if (signUp1 != null) {
                 BeanUtils.copyProperties(signUp, signUp1, BeanCopy.getNullPropertyNames(signUp));
+                signUp1.setReview(0);
                 signUpService.save(signUp1);
             } else {
                 signUp.setUserId(user.getId());
+                signUp.setReview(0);
                 signUpService.save(signUp);
             }
         } catch (Exception e) {

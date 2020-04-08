@@ -126,6 +126,7 @@ public class UserController extends BaseController {
             user.setPassword(hashed);
             userService.save(user);
         } catch (Exception e) {
+            e.printStackTrace();
             return new BaseResult(Constants.RESPONSE_CODE_500, "数据库异常");
         }
         return new BaseResult(Constants.RESPONSE_CODE_200, "修改密码成功");
