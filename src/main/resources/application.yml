@@ -13,6 +13,8 @@ jwt:
   tokenHead: Bearer
 #===JWT end===
 
+swagger:
+  enable: false
 
 #上传文件缓存目录
 web.upload-path: D:/fileTemp/

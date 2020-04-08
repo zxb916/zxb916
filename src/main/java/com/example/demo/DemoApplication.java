@@ -15,16 +15,4 @@ public class DemoApplication {
         System.out.println("启动成功");
     }
 
-
-//    @Bean
-//    public Docket swaggerApi() {
-//        return new Docket(DocumentationType.SWAGGER_2)
-//                .select()
-//                .apis(RequestHandlerSelectors.basePackage("com.example"))
-//                .paths(PathSelectors.any())
-//                .build()
-//                .apiInfo(new ApiInfoBuilder().version("1.0").title("sqlite Test").description("sqlite Test").build());
-//    }
-
-
 }

@@ -13,7 +13,6 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 
 @Api(value = "审核模块")
@@ -35,7 +33,7 @@ public class ReviewController extends BaseController {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static final String PATH_LIST = "/list";
-    private static final String PATH_CHECK = "/check";
+    private static final String PATH_CHECK = "/review";
     private static final String PATH_GENERATE_REVIEW_LIST = "/generateReviewList";
     private static final String PATH_EDIT = "/edit";
     private static final String PATH_CREATE_REPORT = "/createReport";
@@ -62,16 +60,12 @@ public class ReviewController extends BaseController {
     }
 
     @ApiOperation(value = "审核")
-    @PostMapping(PATH_CHECK)
-    public BaseResult check(HttpServletRequest request) {
+    @GetMapping(PATH_CHECK)
+    public BaseResult check(@RequestParam(name = "idCard", required = true) String idCard, @RequestParam(name = "reviewOption", required = true) String reviewOption, @RequestParam(name = "check", required = true) Integer review) {
         try {
-            String requestParam = IOUtils.toString(request.getInputStream(), String.valueOf(StandardCharsets.UTF_8));
-            Pair<Boolean, String> result = reviewService.checkAndSave(requestParam);
-            if (!result.getValue0()) {
-                return new BaseResult(Constants.RESPONSE_CODE_200, result.getValue1());
-            }
-            return new BaseResult(Constants.RESPONSE_CODE_200, result.getValue1());
-        } catch (IOException e) {
+            reviewService.checkAndSave(idCard,reviewOption,review);
+            return new BaseResult(Constants.RESPONSE_CODE_200, "审核成功");
+        } catch (Exception e) {
             logger.error(e.getMessage());
             return new BaseResult(Constants.RESPONSE_CODE_500, "审核失败");
         }

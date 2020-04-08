@@ -2,7 +2,6 @@ package com.example.demo.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.model.SignUp;
-import org.javatuples.Pair;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +18,7 @@ public interface ReviewService {
      */
     List<JSONObject> getList(String applyWorkType, String year);
 
-    Pair<Boolean, String> checkAndSave(String requestParam);
+    void checkAndSave(String idCard, String reviewOption, Integer review);
 
     /**
      * 生成报表

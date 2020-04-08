@@ -81,4 +81,14 @@ public interface UserService {
      */
     void delete(User user);
 
+    /**
+     * 根据身份证号，姓名，手机号查询用户
+     *
+     * @param idCard
+     * @param name
+     * @param mobile
+     * @return
+     */
+    User findUser(String idCard, String name, String mobile);
+
 }

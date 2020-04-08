@@ -260,5 +260,41 @@ public class UserController extends BaseController {
 
     }
 
+    //学生重置密码
+    @ApiOperation(value = "学生重置密码")
+    @PostMapping(value = "/changeUserPassword")
+    @ResponseBody
+    public BaseResult changeUserPassword(@RequestBody String str) {
+        String password = null;
+        logger.info("修改密码", str);
+        Map<String, String> object = (Map<String, String>) JSONObject.parse(str);
+        String idCard = object.get("idCard");
+        String userName = object.get("userName");
+        String mobile = object.get("mobile");
+        if (idCard == null) {
+            return new BaseResult(Constants.RESPONSE_CODE_500, "idCard不能为null");
+        }
+        if (userName == null) {
+            return new BaseResult(Constants.RESPONSE_CODE_500, "name不能为null");
+        }
+        if (mobile == null) {
+            return new BaseResult(Constants.RESPONSE_CODE_500, "mobile不能为null");
+        }
+        try {
+            User user = userService.findUser(idCard, userName, mobile);
+            if (user == null) {
+                return new BaseResult(Constants.RESPONSE_CODE_404, "未注册的用户，请先注册");
+            }
+            String hashed = BCrypt.hashpw("123456", BCrypt.gensalt(12));
+            user.setOldPassword("123456");
+            user.setPassword(hashed);
+            userService.save(user);
+            password = user.getOldPassword();
+        } catch (Exception e) {
+            return new BaseResult(Constants.RESPONSE_CODE_500, "数据库异常");
+        }
+        return new BaseResult(Constants.RESPONSE_CODE_200, "重置密码成功", password);
+    }
+
 
 }

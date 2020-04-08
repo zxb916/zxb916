@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Repository;
 
@@ -27,4 +28,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     @Override
     void delete(User user);
+
+    @Query(value = "select * from user where id_card = :idCard and  user_name = :userName and mobile = :mobile", nativeQuery = true)
+    User findUser(@Param("idCard") String idCard, @Param("userName") String userName, @Param("mobile") String mobile);
 }

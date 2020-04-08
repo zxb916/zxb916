@@ -176,4 +176,10 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    @Override
+    public User findUser(String idCard, String name, String mobile) {
+        User user = adminMapper.findUser(idCard, name, mobile);
+        return user;
+    }
+
 }

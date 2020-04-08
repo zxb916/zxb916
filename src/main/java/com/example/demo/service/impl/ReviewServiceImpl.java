@@ -22,7 +22,6 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -87,29 +86,13 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Pair<Boolean, String> checkAndSave(String requestParam) {
-        Pair<Boolean, String> result = new Pair<Boolean, String>(false, "未知");
-        JSONObject param = JSONObject.parseObject(requestParam);
-        String idCard = param.get("idCard").toString();
-        String reviewOption = param.get("reviewOption").toString();
-//        String auditOpinion = param.get("auditOpinion").toString();
-        Integer check = Integer.parseInt(param.get("check").toString());
-        if (StringUtils.isEmpty(idCard)) {
-            return result.setAt1("身份证不能为空");
-        }
-        if (StringUtils.isEmpty(param.get("reviewOption").toString())) {
-            return result.setAt1("审核意见不能为空");
-        }
-//        if (StringUtils.isEmpty(param.get("review").toString())) {
-//            return result.setAt1("审核不能为空");
-//        }
+    public void checkAndSave(String idCard, String reviewOption, Integer review) {
+
         User user = userRepository.findByIdCardLike(idCard).get(0);
         SignUp signup = reviewRepository.findByUserId(user.getId());
         signup.setReviewOption(reviewOption);
-//        signup.setAuditOpinion(auditOpinion);
-        signup.setReview(check);
+        signup.setReview(review);
         reviewRepository.save(signup);
-        return result.setAt0(false).setAt1("审核成功");
     }
 
     @Override
@@ -357,6 +340,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     public File open(String filePath, String type, boolean visible) {
+        String s = null;
         try {
             ActiveXComponent app = new ActiveXComponent(type);
             app.setProperty("Visible", new Variant(visible));
@@ -364,13 +348,16 @@ public class ReviewServiceImpl implements ReviewService {
             Dispatch document = Dispatch.call(documents, "Open", filePath).toDispatch();
             System.out.println("JacobUtil.class : 打开文档   " + filePath);
             try {
-                Dispatch.call(document, "SaveAs", "C:\\Users\\huaruiview\\Desktop\\1.pdf", new Variant(17));
+                s = (new File(filePath)).getParent() + ".pdf";
+                Dispatch.call(document, "SaveAs", s, new Variant(17));
+                System.out.println("生成的pdf文件位置：" + s);
             } catch (Exception e) {
                 System.err.println("JacobUtil.class : 文档转换为pdf失败！");
                 e.printStackTrace();
             }
             try {
                 Dispatch.call(document, "Close", false);
+
                 if (app != null) {
                     app.invoke("Quit", new Variant[]{});
                     app = null;
@@ -384,6 +371,6 @@ public class ReviewServiceImpl implements ReviewService {
             System.err.println("JacobUtil.class : 打开文档失败 " + filePath);
             e.printStackTrace();
         }
-        return new File("C:\\Users\\huaruiview\\Desktop\\1.pdf");
+        return new File(s);
     }
 }
