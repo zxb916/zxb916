@@ -8,8 +8,10 @@ import com.example.demo.repository.TrainRepository;
 import com.example.demo.repository.UserExtRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
+import com.example.demo.util.BeanCopy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -125,20 +127,23 @@ public class UserServiceImpl implements UserService {
     public User update(User oldUser, User user) {
         for (Resume o : oldUser.getResumes()) {
             o.setUser(null);
+            System.out.println(o.getId());
+            resumeRepository.deleteById(o.getId());
             resumeRepository.delete(o);
-//            resumeRepository.deleteByUserId(oldUser.getId());
         }
         for (Train o : oldUser.getTrains()) {
             o.setUser(null);
+            System.out.println(o.getId());
+            trainRepository.deleteById(o.getId());
             trainRepository.delete(o);
-//            trainRepository.deleteByUserId(oldUser.getId());
         }
         if (oldUser.getUserExt() != null) {
             UserExt userExt = oldUser.getUserExt();
             userExt.setUser(null);
             userExtRepository.delete(userExt);
         }
-        oldUser.getUserExt().setUser(user);
+        BeanUtils.copyProperties(user, oldUser, BeanCopy.getNullPropertyNames(user));
+        oldUser.getUserExt().setUser(oldUser);
         for (Resume o : oldUser.getResumes()) {
             o.setUser(oldUser);
         }

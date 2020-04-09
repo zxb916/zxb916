@@ -68,7 +68,6 @@ public class SignUpController {
                 return new BaseResult(Constants.RESPONSE_CODE_404, "用户id不能为空");
             }
             User oldUser = userService.getItem(user.getId()).get();
-            BeanUtils.copyProperties(user, oldUser, BeanCopy.getNullPropertyNames(user));
             userService.update(oldUser, user);
             SignUp signUp1 = signUpService.findByUserIdAndYear(user.getId(), signUpUser.getYear());
             if (signUp1 != null) {
