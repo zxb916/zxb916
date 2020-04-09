@@ -28,4 +28,8 @@ public interface SignUpRepository extends CrudRepository<SignUp, Long> {
 
     @Query(value = "select * from sign_up where create_time like :year%", nativeQuery = true)
     List<SignUp> getListAll(@Param("year") String year);
+
+    //查询去年相同工种和技能等级的报名情况
+    @Query(value = "select * from sign_up where id = :id and create_time like :lastYear%", nativeQuery = true)
+    SignUp findLastYear(@Param("id") Long id, @Param("lastYear") String lastYear);
 }

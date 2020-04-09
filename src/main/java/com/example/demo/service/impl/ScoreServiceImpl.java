@@ -22,7 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -79,13 +80,14 @@ public class ScoreServiceImpl implements ScoreService {
         } else {
             signUpList = signUpRepository.getSignUpList(applyWorkType, year);
         }
+
         for (SignUp signUp : signUpList) {
+            Score score = new Score();
             JSONObject object = new JSONObject();
-            Score score = signUp.getScore();
             User user = userRepository.findById(signUp.getUserId()).get();
             UserExt userExt = user.getUserExt();
             object.put("id", signUp.getId());
-            object.put("userId", user.getId());
+            object.put("userId", signUp.getUserId());
             object.put("userName", user.getUserName());
             object.put("idCard", user.getIdCard());
             object.put("soldierId", user.getSoldierId());
@@ -94,11 +96,26 @@ public class ScoreServiceImpl implements ScoreService {
             object.put("deptNo", user.getDeptNo());
             object.put("armedRank", user.getArmedRank());
             object.put("passCard", signUp.getPassCard());
-            object.put("theoryScore", score == null ? "" : score.getTheoryScore());
-            object.put("operationScore", score == null ? "" : score.getOperationScore());
-            object.put("overallScore", score == null ? "" : score.getOverallScore());
-            object.put("finalResult", score == null ? "" : score.getFinalResult());
-            object.put("certificateNo", score == null ? "" : score.getCertificateNo());
+            long lastYear = Long.parseLong(year) - 1;
+            System.out.println(lastYear);
+            SignUp lastSignUp = signUpRepository.findLastYear(signUp.getUserId(), String.valueOf(lastYear));
+            if (lastSignUp != null) {
+                if (signUp.getApplySkillRank().equals(lastSignUp.getApplySkillRank()) && signUp.getApplyWorkType().equals(lastSignUp.getApplyWorkType())) {
+                    score = lastSignUp.getScore();
+                    object.put("theoryScore", Integer.parseInt(score.getTheoryScore().toString()) < 60 ? "" : score.getTheoryScore());
+                    object.put("operationScore", Integer.parseInt(score.getOperationScore().toString()) < 60 ? "" : score.getOperationScore());
+                    object.put("overallScore", Integer.parseInt(score.getOverallScore().toString()) < 60 ? "" : score.getOverallScore());
+                    object.put("finalResult", score == null ? "" : score.getFinalResult());
+                    object.put("certificateNo", score == null ? "" : score.getCertificateNo());
+                }
+            } else {
+                score = signUp.getScore();
+                object.put("theoryScore", score == null ? "" : score.getTheoryScore());
+                object.put("operationScore", score == null ? "" : score.getOperationScore());
+                object.put("overallScore", score == null ? "" : score.getOverallScore());
+                object.put("finalResult", score == null ? "" : score.getFinalResult());
+                object.put("certificateNo", score == null ? "" : score.getCertificateNo());
+            }
             result.add(object);
         }
         return result;
