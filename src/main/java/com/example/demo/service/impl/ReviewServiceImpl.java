@@ -250,7 +250,7 @@ public class ReviewServiceImpl implements ReviewService {
         resultMap.put("createTime", signup.getCreateTime().split(" ")[0]);
         resultMap.put("userName", user.getUserName());
         resultMap.put("sex", user.getUserExt().getSex());
-        resultMap.put("profilePhoto", ImgBase64.getImgStr(uploadPath + user.getUserExt().getProfilePhoto().split("/")[user.getUserExt().getProfilePhoto().split("/").length - 1]));
+        resultMap.put("profilePhoto", user.getUserExt().getProfilePhoto() == null ? "" : ImgBase64.getImgStr(uploadPath + user.getUserExt().getProfilePhoto().split("/")[user.getUserExt().getProfilePhoto().split("/").length - 1]));
         resultMap.put("idCard", user.getIdCard());
         resultMap.put("birthday", user.getUserExt().getBirthday() != null ? sdf1.format(user.getUserExt().getBirthday()) : "");
         resultMap.put("soldierId", user.getSoldierId());
