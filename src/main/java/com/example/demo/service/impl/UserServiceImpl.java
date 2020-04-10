@@ -126,10 +126,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(User oldUser, User user) {
         for (Resume o : oldUser.getResumes()) {
+            o.setUser(null);
             resumeRepository.deleteById(o.getId());
             resumeRepository.delete(o);
         }
         for (Train o : oldUser.getTrains()) {
+            o.setUser(null);
             trainRepository.deleteById(o.getId());
             trainRepository.delete(o);
         }
