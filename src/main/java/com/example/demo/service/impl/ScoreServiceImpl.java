@@ -82,6 +82,9 @@ public class ScoreServiceImpl implements ScoreService {
         }
 
         for (SignUp signUp : signUpList) {
+            if (!(signUp.getReview() == 1)) {
+                continue;
+            }
             Score score = new Score();
             JSONObject object = new JSONObject();
             User user = userRepository.findById(signUp.getUserId()).get();
