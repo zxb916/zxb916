@@ -23,6 +23,7 @@ public class User {
     /**
      * 角色 是否是管理员
      */
+    @JsonIgnore
     @Column(name = "is_admin")
     private RoleType isAdmin;
     /**
@@ -78,6 +79,7 @@ public class User {
     /**
      * 加密后的密码
      */
+    @JsonIgnore
     @Column(name = "password")
     private String password;
 
