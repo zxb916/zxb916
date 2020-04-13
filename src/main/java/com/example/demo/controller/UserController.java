@@ -7,9 +7,7 @@ import com.example.demo.common.BaseController;
 import com.example.demo.common.BaseResult;
 import com.example.demo.common.Constants;
 import com.example.demo.component.JwtTokenUtil;
-import com.example.demo.model.Resume;
 import com.example.demo.model.SignUp;
-import com.example.demo.model.Train;
 import com.example.demo.model.User;
 import com.example.demo.service.SignUpService;
 import com.example.demo.service.UserService;
@@ -25,14 +23,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Api(value = "用户")
 @RestController
@@ -61,10 +60,18 @@ public class UserController extends BaseController {
     @ApiOperation(value = "用户注册")
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseBody
-    public Object register(@RequestBody User user) {
+    public BaseResult register(@RequestBody User user) {
         logger.info("注册" + user);
+        if (StringUtils.isEmpty(user.getIdCard())) {
+            return new BaseResult(Constants.RESPONSE_CODE_403, "身份证号不能为空");
+        }
+
+        AdminUserDetails adminUserDetails = userService.getAdminByIdCard(user.getIdCard());
+        if (adminUserDetails.getUser() != null) {
+            return new BaseResult(Constants.RESPONSE_CODE_403, "该用户已注册");
+        }
         userService.register(user);
-        return ResponseEntity.ok(new BaseResult(Constants.RESPONSE_CODE_200, "注册成功"));
+        return new BaseResult(Constants.RESPONSE_CODE_200, "注册成功");
     }
 
 
@@ -112,7 +119,7 @@ public class UserController extends BaseController {
     @PostMapping(value = "/changePassword", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public BaseResult changePassword(@RequestBody String str, HttpServletRequest request) {
-        logger.info("修改密码", str);
+        logger.info("修改密码" + str);
         AdminUserDetails adminUserDetails = jwtTokenUtil.getAdminByToken(request.getHeader(tokenHeader).substring(this.tokenHead.length()));
         try {
             Map<String, String> object = (Map<String, String>) JSONObject.parse(str);
@@ -190,7 +197,7 @@ public class UserController extends BaseController {
     @GetMapping(value = "/getOne")
     public BaseResult getOne(@RequestParam(value = "idCard", required = false) String idCard, @RequestParam(value = "year") String year, HttpServletRequest request) {
         logger.info("查询学员基本信息 idCard=" + idCard + "  year=" + year);
-        User user = null;
+        User user;
         Map<String, Object> map = new HashMap<>();
         try {
             if (!StringUtils.isEmpty(idCard)) {
@@ -205,10 +212,6 @@ public class UserController extends BaseController {
                 user = adminUserDetails.getUser();
             }
             SignUp signUp = signUpService.findByUserIdAndYear(user.getId(), year);
-            Set<Resume> sortSet = new TreeSet<Resume>((o1, o2) -> o1.getSub().compareTo(o2.getSub()));
-            sortSet.addAll(user.getResumes());
-            Set<Train> sortSet1 = new TreeSet<Train>((o1, o2) -> o1.getSub().compareTo(o2.getSub()));
-            sortSet1.addAll(user.getTrains());
             map.put("user", user);
             map.put("signUp", signUp);
         } catch (Exception e) {
@@ -269,8 +272,8 @@ public class UserController extends BaseController {
     @PostMapping(value = "/changeUserPassword")
     @ResponseBody
     public BaseResult changeUserPassword(@RequestBody String str) {
-        String password = null;
-        logger.info("修改密码", str);
+        String password;
+        logger.info("修改密码" + str);
         Map<String, String> object = (Map<String, String>) JSONObject.parse(str);
         String idCard = object.get("idCard");
         String userName = object.get("userName");
